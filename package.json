@@ -2,7 +2,7 @@
   "name": "becca",
   "private": true,
   "version": "1.0.0",
-  "homepage": "https://www.rebeccabegis.com",
+  "homepage": "https://colorbled.github.io/RebeccaBegis",
   "type": "module",
   "scripts": {
     "predeploy": "npm run build",
