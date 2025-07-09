@@ -3,7 +3,7 @@ const artThumbnails = {
     3: "/assets/art/thumbnails/3.jpg",
     4: "/assets/art/thumbnails/4.jpg",
     5: "/assets/art/thumbnails/5.jpg",
-    6: "/assets/art/4-angled-cropped.jpg",
+    6: "/assets/art/thumbnails/44.jpg",
     7: "/assets/art/thumbnails/7.jpg",
     8: "/assets/art/thumbnails/8.jpg",
     9: "/assets/art/thumbnails/9.jpg",

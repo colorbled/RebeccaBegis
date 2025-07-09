@@ -59,7 +59,7 @@ const artworkData = [
         image: artThumbnails[6],
         placeholder: artPlaceholderImages[6],
         images: [
-            artThumbnails[6],
+            artZoomImages[6],
         ],
         placeholders: [
             artZoomPlaceholders[6]

@@ -3,6 +3,7 @@ const artZoomImages = {
     3: "/assets/art/zoom/3.jpg",
     4: "/assets/art/zoom/4.jpg",
     5: "/assets/art/zoom/5.jpg",
+    6: "/assets/art/zoom/44.jpg",
     7: "/assets/art/zoom/7.jpg",
     8: "/assets/art/zoom/8.jpg",
     9: "/assets/art/zoom/9.jpg",
