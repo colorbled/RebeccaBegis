@@ -1,0 +1,141 @@
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:ital,wght@0,500;1,500&display=swap');
+@import "tailwindcss";
+
+
+:root {
+  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
+  line-height: 1.5;
+  font-weight: 400;
+
+  color-scheme: light dark;
+  color: rgba(255, 255, 255, 0.87);
+  background-color: #242424;
+
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#root {
+  background-image: url(src/assets/background.png);
+  background-image: url(src/assets/bg.jpg);
+  background-attachment: fixed;
+  background-size: cover;
+}
+
+.main-wrapper {
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 1500px, rgba(0, 0, 0, 1) 100%);
+}
+
+a {
+
+  text-decoration: inherit;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings:
+          "wdth" 100;
+}
+a:hover {
+
+}
+
+body {
+  margin: 0;
+  display: flex;
+  place-items: center;
+  min-width: 320px;
+  min-height: 100vh;
+  width: 100%;
+}
+
+.image-border {
+  border: solid #fff 20px;
+  box-shadow: 100px 100px 180px 10px rgba(0, 0, 0, 0.75) inset;
+  min-height: 70vh;
+}
+
+.marquee {
+  position: absolute;
+  top: 0;
+  left: 0;
+  white-space: nowrap;
+  width: 100%;
+  overflow: hidden;
+}
+
+.marquee-content {
+  display: inline-block;
+  animation: marquee-scroll 40s linear infinite;
+}
+
+.artwork-modal-images > div > img[alt~="1"] {
+
+}
+
+.site-logo svg{
+  width:65px;
+  height: 65px;
+}
+
+.site-logo svg path {
+  fill: #fff;
+}
+
+.sketch-eye {
+  stroke-dasharray: 1000;
+  stroke-dashoffset: 1000;
+  animation: sketch 2s ease-in-out infinite alternate;
+}
+
+@keyframes sketch {
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+
+@keyframes marquee-scroll {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-100%);
+  }
+}
+
+.reflected {
+  transform: scaleY(-1);
+  filter: blur(2px);
+}
+
+
+#root {
+  width: 100%;
+}
+
+h1 {
+  font-size: 3.2em;
+  line-height: 1.1;
+}
+
+button {
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 0.6em 1.2em;
+  font-size: 1em;
+  font-weight: 500;
+  font-family: inherit;
+  /* background-color: #1a1a1a; */
+  cursor: pointer;
+  transition: border-color 0.25s;
+}
+button:hover {
+  /* border-color: #646cff; */
+}
+button:focus,
+button:focus-visible {
+  /* outline: 4px auto -webkit-focus-ring-color; */
+}
