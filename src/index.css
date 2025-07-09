@@ -19,7 +19,7 @@
 
 #root {
   background-image: url(src/assets/background.png);
-  background-image: url(src/assets/bg.jpg);
+  background-image: url(/bg.jpg);
   background-attachment: fixed;
   background-size: cover;
 }
