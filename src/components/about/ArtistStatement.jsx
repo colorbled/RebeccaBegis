@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 
 export default function ArtistStatement() {
     return (
-        <section className="relative text-white py-24 px-6 md:px-12 overflow-hidden">
+        <section className="relative text-white pt-24 pb-6 px-6 md:px-12 overflow-hidden">
             <div className="max-w-4xl mx-auto text-center relative z-10">
                 {/* Main Statement with animation */}
                 <motion.h2
@@ -13,20 +13,20 @@ export default function ArtistStatement() {
                     transition={{ duration: 1, ease: 'easeOut' }}
                     viewport={{ once: true, amount: 0.5 }}
                 >
-                    I begin with old photographs. Where it ends depends on the day.
+                    Artist Statement
 
 
                 </motion.h2>
 
                 {/* Reflected Statement with animation */}
                 <motion.h2
-                    className="text-3xl md:text-5xl font-light leading-tight opacity-20 mt-2 pointer-events-none select-none transform scale-y-[-1] blur-sm"
+                    className="text-3xl md:text-5xl font-light leading-tight opacity-20 -mt-1 pointer-events-none select-none transform scale-y-[-1] blur-sm"
                     initial={{ opacity: 0, y: -40 }}
                     whileInView={{ opacity: 0.2, y: 0 }}
                     transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
                     viewport={{ once: true, amount: 0.5 }}
                 >
-                    I begin with old photographs. Where it ends depends on the day.
+                    Artist Statement
 
 
                 </motion.h2>
