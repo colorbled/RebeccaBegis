@@ -35,6 +35,7 @@ export default function LazyImage({ src, placeholder, alt, className = '', bare 
                 ref={imgRef}
                 src={src}
                 alt={alt}
+                loading={`lazy`}
                 onLoad={() => setIsLoaded(true)}
                 className={`relative w-full h-full object-cover transition-opacity duration-500 ease-in ${
                     isLoaded ? 'opacity-100' : 'opacity-0'

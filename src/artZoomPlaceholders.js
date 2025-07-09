@@ -1,0 +1,27 @@
+const artZoomPlaceholders = {
+    2: "/assets/art/zoom/placeholders/2.jpg",
+    3: "/assets/art/zoom/placeholders/3.jpg",
+    4: "/assets/art/zoom/placeholders/4.jpg",
+    5: "/assets/art/zoom/placeholders/5.jpg",
+    6: "/assets/art/4-angled-cropped-placeholder.jpg",
+    7: "/assets/art/zoom/placeholders/7.jpg",
+    8: "/assets/art/zoom/placeholders/8.jpg",
+    9: "/assets/art/zoom/placeholders/9.jpg",
+    10: "/assets/art/zoom/placeholders/10.jpg",
+    11: "/assets/art/zoom/placeholders/11.jpg",
+    12: "/assets/art/zoom/placeholders/12.jpg",
+    13: "/assets/art/zoom/placeholders/13.jpg",
+    14: "/assets/art/zoom/placeholders/14.jpg",
+    15: "/assets/art/zoom/placeholders/15.jpg",
+    16: "/assets/art/zoom/placeholders/16.jpg",
+    17: "/assets/art/zoom/placeholders/17.jpg",
+    18: "/assets/art/zoom/placeholders/18.jpg",
+    19: "/assets/art/zoom/placeholders/19.jpg",
+    20: "/assets/art/zoom/placeholders/20.jpg",
+    21: "/assets/art/zoom/placeholders/21.jpg",
+    22: "/assets/art/zoom/placeholders/22.jpg",
+    23: "/assets/art/zoom/placeholders/23.jpg",
+    24: "/assets/art/zoom/placeholders/24.jpg",
+};
+
+export default artZoomPlaceholders;

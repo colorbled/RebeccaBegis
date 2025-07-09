@@ -1,0 +1,27 @@
+const artThumbnails = {
+    2: "/assets/art/thumbnails/2.jpg",
+    3: "/assets/art/thumbnails/3.jpg",
+    4: "/assets/art/thumbnails/4.jpg",
+    5: "/assets/art/thumbnails/5.jpg",
+    6: "/assets/art/4-angled-cropped.jpg",
+    7: "/assets/art/thumbnails/7.jpg",
+    8: "/assets/art/thumbnails/8.jpg",
+    9: "/assets/art/thumbnails/9.jpg",
+    10: "/assets/art/thumbnails/10.jpg",
+    11: "/assets/art/thumbnails/11.jpg",
+    12: "/assets/art/thumbnails/12.jpg",
+    13: "/assets/art/thumbnails/13.jpg",
+    14: "/assets/art/thumbnails/14.jpg",
+    15: "/assets/art/thumbnails/15.jpg",
+    16: "/assets/art/thumbnails/16.jpg",
+    17: "/assets/art/thumbnails/17.jpg",
+    18: "/assets/art/thumbnails/18.jpg",
+    19: "/assets/art/thumbnails/19.jpg",
+    20: "/assets/art/thumbnails/20.jpg",
+    21: "/assets/art/thumbnails/21.jpg",
+    22: "/assets/art/thumbnails/22.jpg",
+    23: "/assets/art/thumbnails/23.jpg",
+    24: "/assets/art/thumbnails/24.jpg",
+};
+
+export default artThumbnails;
