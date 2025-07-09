@@ -27,7 +27,7 @@ export default function PortfolioGallery({ artworkData, setSelectedId, setImageI
 
 function GalleryItem({ art, index, onClick }) {
     const ref = useRef(null);
-    const inView = useInView(ref, { once: true, amount: 0.3 });
+    const inView = useInView(ref, { once: true, amount: 0.15 });
     const controls = useAnimation();
 
     useEffect(() => {
@@ -44,7 +44,7 @@ function GalleryItem({ art, index, onClick }) {
             initial="hidden"
             animate={controls}
             transition={{
-                duration: 0.6,
+                duration: 0.3,
                 ease: 'easeOut',
                 delay: index === 0 ? 0.3 : index * 0.05
             }}
@@ -56,10 +56,10 @@ function GalleryItem({ art, index, onClick }) {
                     placeholder={art.placeholder}
                     alt={art.title}
                     bare
-                    className="transition-transform duration-300 ease-out"
+                    className="transition-transform duration-100 ease-out"
                     motionProps={{
                         whileHover: { scale: 1.08 },
-                        transition: { duration: 0.3, ease: 'easeOut' },
+                        transition: { duration: 0.4, ease: 'easeOut' },
                     }}
                 />
             </div>
