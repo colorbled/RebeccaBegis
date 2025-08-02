@@ -79,6 +79,40 @@ body {
   display: inline-flex;
 }
 
+.resume-category{
+  margin: 1.5rem 0;
+}
+
+.exhibition {
+  margin: 0 0 1.5rem 0;
+}
+
+.exhibition-title {
+  text-decoration: inherit;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+}
+
+.exhibition-desc {
+  font-size: var(--text-sm);
+  line-height: var(--tw-leading, var(--text-sm--line-height));
+}
+
+
+.resume-label {
+  text-decoration: inherit;
+  font-family: "Open Sans", sans-serif;
+  font-optical-sizing: auto;
+  font-weight: 500;
+  font-style: normal;
+  font-variation-settings: "wdth" 100;
+  color: var(--color-zinc-400);
+  text-decoration: underline;
+}
+
 
 .site-logo svg{
   width:65px;
