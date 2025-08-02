@@ -75,6 +75,11 @@ body {
 
 }
 
+.site-logo a {
+  display: inline-flex;
+}
+
+
 .site-logo svg{
   width:65px;
   height: 65px;
