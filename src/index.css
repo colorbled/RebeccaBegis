@@ -24,6 +24,15 @@
   background-size: cover;
 }
 
+@media screen and (max-width:767px) {
+  #root {
+    background-position: top left;
+    background-size: auto;
+    background-position-y: -200px;
+  }
+}
+
+
 .main-wrapper {
   background: linear-gradient(180deg, rgba(0, 0, 0, 0) 0%, rgba(0, 0, 0, 1) 1500px, rgba(0, 0, 0, 1) 100%);
 }
