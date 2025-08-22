@@ -22,7 +22,7 @@ export default function Header() {
 
     function GooglyEye() {
         const eyeRef = useRef(null);
-        const [target, setTarget] = useState({ x: 0, y: 0 });
+        const [target, setTarget] = useState({ x: 7, y: 7 });
         const [pupil, setPupil] = useState({ x: 0, y: 0 });
 
         // Track mouse position and update the *target* pupil position
