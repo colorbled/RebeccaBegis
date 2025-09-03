@@ -10,7 +10,7 @@ export default function ContactForm() {
             </p>
 
             {/* Embedded Google Form */}
-            <div className="max-w-2xl mx-auto rounded-lg shadow-lg aspect-video">
+            <div className="max-w-2xl mx-auto rounded-lg shadow-lg">
                 <iframe
                     src="https://docs.google.com/forms/d/e/1FAIpQLSdfPQC4iefG7G0OPAz7UTzkp_0JvCP-IVJdcyo8QhqMwWgmAQ/viewform?embedded=true"
                     width="100%"
