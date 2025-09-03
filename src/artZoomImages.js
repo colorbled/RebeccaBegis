@@ -11,6 +11,7 @@ const artZoomImages = {
     11: "/assets/art/zoom/11.jpg",
     12: "/assets/art/zoom/12.jpg",
     13: "/assets/art/zoom/13.jpg",
+    15: "/assets/art/zoom/15.jpg",
     16: "/assets/art/zoom/16.jpg",
     17: "/assets/art/zoom/17.jpg",
     18: "/assets/art/zoom/18.jpg",

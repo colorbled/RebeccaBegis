@@ -210,12 +210,13 @@ const artworkData = [
         image: artThumbnails[15],
         placeholder: artPlaceholderImages[15],
         images: [
-            artThumbnails[15]
+            artZoomImages[15]
         ],
         placeholders: [
             artZoomPlaceholders[15]
         ]
     },
+    /*
     {
         id: 15,
         title: 'Study of Love',
@@ -231,6 +232,8 @@ const artworkData = [
             artZoomPlaceholders[16]
         ]
     },
+
+     */
     {
         id: 16,
         title: 'The Dunce Frog',
