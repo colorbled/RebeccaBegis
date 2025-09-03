@@ -15,7 +15,7 @@ export default function ContactForm() {
                     src="https://docs.google.com/forms/d/e/1FAIpQLSdfPQC4iefG7G0OPAz7UTzkp_0JvCP-IVJdcyo8QhqMwWgmAQ/viewform?embedded=true"
                     width="100%"
                     height="100%"
-                    className="w-full h-[850px] border-none"
+                    className="w-full google-form border-none"
                     loading="lazy"
                     title="Contact Form"
                 >

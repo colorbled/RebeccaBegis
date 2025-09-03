@@ -60,6 +60,10 @@ body {
   width: 100%;
 }
 
+.google-form {
+  height: 900px;
+}
+
 .image-border {
   border: solid #fff 20px;
   box-shadow: 100px 100px 180px 10px rgba(0, 0, 0, 0.75) inset;
