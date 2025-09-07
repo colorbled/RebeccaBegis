@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import LazyImage from './LazyImage';
+import ModalImage from './ModalImage';
 import { X } from 'lucide-react';
 
 
@@ -61,7 +61,7 @@ export default function ArtworkModal({
                     onClick={(e) => e.stopPropagation()}
                 >
                     <div className="artwork-modal-images relative w-full min-h-[200px] aspect-[3/2] max-h-[65vh]">
-                        <LazyImage
+                        <ModalImage
                             key={selectedArtwork.images[imageIndex]}
                             src={selectedArtwork.images[imageIndex]}
                             placeholder={
@@ -69,7 +69,7 @@ export default function ArtworkModal({
                                 selectedArtwork.placeholder
                             }
                             alt={`${selectedArtwork.title} image ${imageIndex + 1}`}
-                            className={`w-full h-full object-contain transition-opacity duration-300 ${hasLoadedOnce ? 'opacity-100' : 'opacity-0'}`}
+                            className={`w-full h-full object-contain block transition-opacity duration-300 ${hasLoadedOnce ? 'opacity-100' : 'opacity-0'}`}
                         />
                         {/* Optional nav buttons */}
                         {/*
