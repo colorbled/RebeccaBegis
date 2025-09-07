@@ -35,7 +35,7 @@ export default function AboutHero() {
     return (
         <section
             ref={sectionRef}
-            className="m-10 relative border-0 border-black overflow-hidden"
+            className="m-6 relative border-0 border-black overflow-hidden"
         >
             {/* Background Image */}
             <div

@@ -19,6 +19,7 @@ export default function About() {
     return (
         <>
             <AboutHero />
+            <BioSection />
             <ArtistStatement />
             <AboutMe />
             <ResumeSection />

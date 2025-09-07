@@ -27,8 +27,6 @@ export default function ArtistStatement() {
                     viewport={{ once: true, amount: 0.5 }}
                 >
                     Artist Statement
-
-
                 </motion.h2>
             </div>
 
