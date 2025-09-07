@@ -9,8 +9,26 @@ export default function ArtworkModal({
                                          handleNext,
                                          handlePrev
                                      }) {
+    const MOBILE_WIDTH = 768;
+    const [isMobile, setIsMobile] = useState(window.innerWidth < MOBILE_WIDTH);
     const [hasLoadedOnce, setHasLoadedOnce] = useState(false);
 
+    // Detect window resize and auto-close modal if resizing into mobile
+    useEffect(() => {
+        const handleResize = () => {
+            const mobile = window.innerWidth < MOBILE_WIDTH;
+            setIsMobile(mobile);
+
+            if (mobile && selectedArtwork) {
+                setSelectedId(null);
+            }
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, [selectedArtwork, setSelectedId]);
+
+    // Preload image
     useEffect(() => {
         if (!selectedArtwork?.images?.[imageIndex]) return;
 
@@ -19,7 +37,8 @@ export default function ArtworkModal({
         img.onload = () => setHasLoadedOnce(true);
     }, [imageIndex, selectedArtwork]);
 
-    if (!selectedArtwork) return null;
+    // Do not render modal on mobile
+    if (!selectedArtwork || isMobile) return null;
 
     return (
         <AnimatePresence>
@@ -50,6 +69,7 @@ export default function ArtworkModal({
                             alt={`${selectedArtwork.title} image ${imageIndex + 1}`}
                             className={`w-full h-full object-contain transition-opacity duration-300 ${hasLoadedOnce ? 'opacity-100' : 'opacity-0'}`}
                         />
+                        {/* Optional nav buttons */}
                         {/*
                         <button
                             onClick={handlePrev}
