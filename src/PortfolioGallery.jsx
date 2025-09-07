@@ -50,6 +50,9 @@ function GalleryItem({ art, index, onClick, isMobile }) {
         }
     }, [inView, controls]);
 
+    const isInitialLoad = index <= 2; // Only apply delay to first 3 items
+    const delay = isInitialLoad ? index * 0.05 : 0;
+
     return (
         <motion.div
             ref={ref}
@@ -60,7 +63,7 @@ function GalleryItem({ art, index, onClick, isMobile }) {
             transition={{
                 duration: 0.3,
                 ease: 'easeOut',
-                delay: index === 0 ? 0.3 : index * 0.05
+                delay: delay,
             }}
             onClick={onClick}
         >
@@ -80,15 +83,9 @@ function GalleryItem({ art, index, onClick, isMobile }) {
             <div className="w-full md:w-1/2 flex items-center justify-center md:justify-start px-4 sm:px-6 md:px-10">
                 <div className="text-center md:text-left w-full max-w-md">
                     <h2 className="text-xl sm:text-2xl font-serif italic mb-2 text-left">{art.title}</h2>
-                    <p className="text-zinc-500 text-sm text-left">
-                        {art.medium}
-                    </p>
-                    <p className="text-zinc-500 text-sm text-left">
-                        {art.dimensions}
-                    </p>
-                    <p className="text-zinc-500 text-sm text-left">
-                        {art.year}
-                    </p>
+                    <p className="text-zinc-500 text-sm text-left">{art.medium}</p>
+                    <p className="text-zinc-500 text-sm text-left">{art.dimensions}</p>
+                    <p className="text-zinc-500 text-sm text-left">{art.year}</p>
                 </div>
             </div>
         </motion.div>
