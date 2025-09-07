@@ -53,12 +53,11 @@ export default function Home() {
                 isClosing={isClosing}
                 setIsClosing={setIsClosing}
                 onCloseComplete={() => {
-                    // 🔧 Called after modal fully closes
                     setIsClosing(false);
                     setSelectedId(null);
                 }}
             />
-            {!selectedArtwork && (
+            {!(selectedArtwork && !isClosing) && (
                 <BackToTopButton scrollToTop={scrollToTop} scrollThreshold={300} />
             )}
         </>

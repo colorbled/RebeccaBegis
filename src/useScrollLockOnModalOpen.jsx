@@ -8,16 +8,13 @@ export default function useScrollLockOnModalOpen(selectedArtwork, isClosing, len
         const html = document.documentElement;
         const isDesktop = window.innerWidth >= MOBILE_WIDTH;
 
-        // Lock scroll only when modal is open and not closing
-        if (selectedArtwork && !isClosing && isDesktop) {
+        const shouldLock = !!selectedArtwork && !isClosing;
+
+        if (shouldLock && isDesktop) {
             html.classList.add('overflow-hidden');
             lenisRef.current?.stop();
-        } else {
-            html.classList.remove('overflow-hidden');
-            lenisRef.current?.start();
         }
 
-        // Cleanup on unmount just in case
         return () => {
             html.classList.remove('overflow-hidden');
             lenisRef.current?.start();
