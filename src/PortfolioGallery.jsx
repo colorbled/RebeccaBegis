@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { motion, useAnimation, useInView } from 'framer-motion';
 import LazyImage from './LazyImage';
 
@@ -8,6 +8,17 @@ const variants = {
 };
 
 export default function PortfolioGallery({ artworkData, setSelectedId, setImageIndex }) {
+    const [isMobile, setIsMobile] = useState(window.innerWidth < 768);
+
+    useEffect(() => {
+        const handleResize = () => {
+            setIsMobile(window.innerWidth < 768);
+        };
+
+        window.addEventListener('resize', handleResize);
+        return () => window.removeEventListener('resize', handleResize);
+    }, []);
+
     return (
         <section className="flex flex-col gap-12 px-4 sm:px-6 md:px-8 max-w-5xl mx-auto">
             {artworkData.map((art, index) => (
@@ -15,9 +26,12 @@ export default function PortfolioGallery({ artworkData, setSelectedId, setImageI
                     key={art.id}
                     art={art}
                     index={index}
+                    isMobile={isMobile}
                     onClick={() => {
-                        setSelectedId(art.id);
-                        setImageIndex(0);
+                        if (!isMobile) {
+                            setSelectedId(art.id);
+                            setImageIndex(0);
+                        }
                     }}
                 />
             ))}
@@ -25,7 +39,7 @@ export default function PortfolioGallery({ artworkData, setSelectedId, setImageI
     );
 }
 
-function GalleryItem({ art, index, onClick }) {
+function GalleryItem({ art, index, onClick, isMobile }) {
     const ref = useRef(null);
     const inView = useInView(ref, { once: true, amount: 0.15 });
     const controls = useAnimation();
@@ -39,7 +53,7 @@ function GalleryItem({ art, index, onClick }) {
     return (
         <motion.div
             ref={ref}
-            className="group cursor-pointer flex flex-col md:flex-row items-center md:center min-h-[50vh] gap-6"
+            className={`group ${isMobile ? 'cursor-default' : 'cursor-pointer'} flex flex-col md:flex-row items-center md:center min-h-[50vh] gap-6`}
             variants={variants}
             initial="hidden"
             animate={controls}
