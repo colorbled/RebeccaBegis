@@ -64,6 +64,19 @@ body {
   height: 900px;
 }
 
+.bg-blur {
+  background-color: rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(4px);
+  border-radius: 9999px;
+  right: 30px;
+  top: 30px;
+  transition: background-color 200ms ease-out;
+}
+
+.bg-blur:hover {
+  background-color: rgba(0, 0, 0, 0.7);
+}
+
 .image-border {
   border: solid #fff 20px;
   box-shadow: 100px 100px 180px 10px rgba(0, 0, 0, 0.75) inset;

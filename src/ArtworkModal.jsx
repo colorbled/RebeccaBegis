@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import LazyImage from './LazyImage';
+import { X } from 'lucide-react';
+
 
 export default function ArtworkModal({
                                          selectedArtwork,
@@ -51,10 +53,10 @@ export default function ArtworkModal({
                 onClick={() => setSelectedId(null)}
             >
                 <motion.div
-                    initial={{ scale: 0.95, opacity: 0 }}
-                    animate={{ scale: 1, opacity: 1 }}
-                    exit={{ scale: 0.95, opacity: 0 }}
-                    transition={{ type: 'spring', stiffness: 120, damping: 15 }}
+                    initial={{scale: 0.95, opacity: 0}}
+                    animate={{scale: 1, opacity: 1}}
+                    exit={{scale: 0.95, opacity: 0}}
+                    transition={{type: 'spring', stiffness: 120, damping: 15}}
                     className="bg-zinc-950 text-white w-full max-w-5xl max-h-[90vh] overflow-y-auto rounded-xl p-6 relative"
                     onClick={(e) => e.stopPropagation()}
                 >
@@ -97,9 +99,13 @@ export default function ArtworkModal({
 
                     <button
                         onClick={() => setSelectedId(null)}
-                        className="absolute top-4 right-4 text-zinc-400 hover:text-white text-2xl font-light"
+                        className="absolute top-8 right-8 z-50 bg-blur text-white h-10 w-10 flex items-center justify-center !p-0 border-none group"
+                        aria-label="Close modal"
                     >
-                        ✕
+                        <X
+                            size={20}
+                            className="transition-transform duration-200 ease-out group-hover:rotate-90"
+                        />
                     </button>
                 </motion.div>
             </motion.div>
