@@ -21,7 +21,6 @@ export default function About() {
             <AboutHero />
             <BioSection />
             <ArtistStatement />
-            <AboutMe />
             <ResumeSection />
             <StudioGallery />
             <BackToTopButton scrollToTop={scrollToTop} scrollThreshold={300} />
