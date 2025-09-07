@@ -32,7 +32,7 @@ export default function ResumeSection() {
                 viewport={{ once: true, amount: 0.4 }}
                 className="relative text-white"
             >
-                <div className="relative z-10 px-6 py-2 -mt-10 pb-26 md:px-6 text-zinc-200 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed">
+                <div className="relative z-10 px-6 py-2 -mt-5 md:-mt-10 pb-26 md:px-6 text-zinc-200 max-w-3xl mx-auto text-lg md:text-xl leading-relaxed">
 
                     {/* EDUCATION */}
                     <div className="mb-8">

@@ -10,7 +10,7 @@ export default function AboutMe() {
             className="relative text-white"
         >
             {/* Artist Bio */}
-            <div className="relative z-10 px-6 py-2 -mt-20 pb-26 md:px-20 text-zinc-200">
+            <div className="relative z-10 px-6 py-2 -mt-15 md:-mt-20 pb-26 md:px-20 text-zinc-200">
                 <div className="max-w-3xl mx-auto relative z-10">
                     <p className="text-lg md:text-xl leading-relaxed mt-5">
                         My paintings use bold colors and expressive brushstrokes to explore my perception of the past

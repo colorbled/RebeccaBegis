@@ -36,7 +36,7 @@ export default function BioSection() {
                 viewport={{once: true, amount: 0.4}}
                 className="relative text-white "
             >
-                <div className="relative z-10 py-2 -mt-20 pb-26 text-zinc-200">
+                <div className="relative z-10 py-2 -mt-15 md:-mt-20 pb-26 text-zinc-200">
                     <p className="max-w-3xl mx-auto text-lg md:text-xl leading-relaxed mt-10">
                         <strong>Rebecca Begis is a traditional oil painter whose work explores the intersection
                             of
