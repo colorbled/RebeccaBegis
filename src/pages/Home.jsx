@@ -1,4 +1,3 @@
-// src/pages/Home.jsx
 import HomeHero from '../HomeHero';
 import PortfolioGallery from '../PortfolioGallery';
 import ArtworkModal from '../ArtworkModal';
@@ -13,6 +12,8 @@ import { useEffect, useState } from 'react';
 export default function Home() {
     const lenisRef = useLenisScroll();
     const [selectedId, setSelectedId] = useState(null);
+    const [isClosing, setIsClosing] = useState(false);
+
     const selectedArtwork = artworkData.find((a) => a.id === selectedId);
 
     const {
@@ -22,20 +23,25 @@ export default function Home() {
         reset: resetCarousel
     } = useCarousel(selectedArtwork?.images || []);
 
-    useScrollLockOnModalOpen(selectedArtwork, lenisRef);
+    const scrollToTop = useScrollToTop(lenisRef);
 
+    // Scroll lock logic
+    useScrollLockOnModalOpen(selectedArtwork, isClosing, lenisRef);
+
+    // Reset carousel whenever artwork changes
     useEffect(() => {
         resetCarousel();
     }, [selectedId]);
-
-    const scrollToTop = useScrollToTop(lenisRef);
 
     return (
         <>
             <HomeHero />
             <PortfolioGallery
                 artworkData={artworkData}
-                setSelectedId={setSelectedId}
+                setSelectedId={(id) => {
+                    setIsClosing(false); // Always reset closing
+                    setSelectedId(id);  // Open modal
+                }}
                 setImageIndex={resetCarousel}
             />
             <ArtworkModal
@@ -44,8 +50,17 @@ export default function Home() {
                 imageIndex={imageIndex}
                 handleNext={handleNext}
                 handlePrev={handlePrev}
+                isClosing={isClosing}
+                setIsClosing={setIsClosing}
+                onCloseComplete={() => {
+                    // 🔧 Called after modal fully closes
+                    setIsClosing(false);
+                    setSelectedId(null);
+                }}
             />
-            {!selectedArtwork && <BackToTopButton scrollToTop={scrollToTop} scrollThreshold={300} />}
+            {!selectedArtwork && (
+                <BackToTopButton scrollToTop={scrollToTop} scrollThreshold={300} />
+            )}
         </>
     );
 }
