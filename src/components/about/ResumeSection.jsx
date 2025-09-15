@@ -50,15 +50,16 @@ export default function ResumeSection() {
 
                 {/* GROUP EXHIBITIONS */}
                 <ResumeGroup title="Group Exhibitions">
+                    <ResumeItem year="2025" description={<em>Legends and Lore.</em>} location="Artisans in The LOOP, University City, MO." />
+                    <ResumeItem description={<em>After the Storm.</em>} location="MADE Makerspace, St. Louis, MO." />
+                    <ResumeItem description={<em>The Female Gaze (St. Louis Lady's Art Guild.)</em>} location="Artisans in The LOOP, University City, MO." />
+                    <ResumeItem year="2024" description={<em>Hit Like a Girl (St. Louis Lady's Art Guild.)</em>} location="The Crack Fox, St. Louis, MO." />
                     <ResumeItem year="2009" description={<em>Inescapable Beauty, Elusive Sublime.</em>} location="Olympia, WA." />
                     <ResumeItem description={<em>In The Presence Of Others.</em>} location="Evergreen State College, Olympia, WA." />
                     <ResumeItem description={<em>7th Annual Juried Local Art Exhibition.</em>} location="Tacoma Community College, WA." />
                     <ResumeItem year="2008" description={<em>Fluid Exchanges: Fresh from the Studio.</em>} location="Downtown Olympia, WA." />
                     <ResumeItem description={<em>Boxlift Building Open Studios.</em>} location="Boxlift Building, Portland, OR." />
-                    <ResumeItem year="2024" description={<em>Hit Like a Girl.</em>} location="St. Louis Lady's Art Guild. The Crack Fox, St. Louis, MO." />
-                    <ResumeItem year="2025" description={<em>The Female Gaze.</em>} location="St. Louis Lady's Art Guild. Artisans in The LOOP, University City, MO." />
-                    <ResumeItem description={<em>Legends and Lore.</em>} location="Artisans in The LOOP, University City, MO." />
-                    <ResumeItem description={<em>After the Storm.</em>} location="MADE Makerspace, St. Louis, MO." />
+
                 </ResumeGroup>
 
                 {/* AWARDS */}
