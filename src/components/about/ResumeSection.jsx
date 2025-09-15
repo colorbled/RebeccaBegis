@@ -40,7 +40,7 @@ export default function ResumeSection() {
             >
                 {/* EDUCATION */}
                 <ResumeGroup title="Education">
-                    <ResumeItem year="2010" description="Bachelor of Fine Arts. The Evergreen State College." />
+                    <ResumeItem year="2010" description="Bachelor's Degree. The Evergreen State College." />
                 </ResumeGroup>
 
                 {/* SOLO EXHIBITIONS */}
@@ -55,6 +55,10 @@ export default function ResumeSection() {
                     <ResumeItem description={<em>7th Annual Juried Local Art Exhibition.</em>} location="Tacoma Community College, WA." />
                     <ResumeItem year="2008" description={<em>Fluid Exchanges: Fresh from the Studio.</em>} location="Downtown Olympia, WA." />
                     <ResumeItem description={<em>Boxlift Building Open Studios.</em>} location="Boxlift Building, Portland, OR." />
+                    <ResumeItem year="2024" description={<em>Hit Like a Girl.</em>} location="The Crack Fox, St. Louis, MO." />
+                    <ResumeItem year="2025" description={<em>The Female Gaze.</em>} location="Artisans in The LOOP, University City, MO." />
+                    <ResumeItem description={<em>Legends and Lore.</em>} location="Artisans in The LOOP, University City, MO." />
+                    <ResumeItem description={<em>After the Storm.</em>} location="MADE Makerspace, St. Louis, MO." />
                 </ResumeGroup>
 
                 {/* AWARDS */}
