@@ -55,8 +55,8 @@ export default function ResumeSection() {
                     <ResumeItem description={<em>7th Annual Juried Local Art Exhibition.</em>} location="Tacoma Community College, WA." />
                     <ResumeItem year="2008" description={<em>Fluid Exchanges: Fresh from the Studio.</em>} location="Downtown Olympia, WA." />
                     <ResumeItem description={<em>Boxlift Building Open Studios.</em>} location="Boxlift Building, Portland, OR." />
-                    <ResumeItem year="2024" description={<em>Hit Like a Girl.</em>} location="The Crack Fox, St. Louis, MO." />
-                    <ResumeItem year="2025" description={<em>The Female Gaze.</em>} location="Artisans in The LOOP, University City, MO." />
+                    <ResumeItem year="2024" description={<em>Hit Like a Girl.</em>} location="St. Louis Lady's Art Guild. The Crack Fox, St. Louis, MO." />
+                    <ResumeItem year="2025" description={<em>The Female Gaze.</em>} location="St. Louis Lady's Art Guild. Artisans in The LOOP, University City, MO." />
                     <ResumeItem description={<em>Legends and Lore.</em>} location="Artisans in The LOOP, University City, MO." />
                     <ResumeItem description={<em>After the Storm.</em>} location="MADE Makerspace, St. Louis, MO." />
                 </ResumeGroup>
