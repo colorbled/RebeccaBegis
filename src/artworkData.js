@@ -18,6 +18,18 @@ const artworkData = [
         placeholders: [artZoomPlaceholders[5]]
     },
 
+    {
+        id: 26,
+        title: 'asdf',
+        dimensions: '30x60',
+        medium: 'Oil on Stretched Canvas',
+        year: 2025,
+        image: artThumbnails[26],
+        placeholder: artPlaceholderImages[26],
+        images: [artZoomImages[26]],
+        placeholders: [artZoomPlaceholders[26]]
+    },
+
     // Sorted 2025 works
     {
         id: 10,
@@ -251,6 +263,39 @@ const artworkData = [
         placeholder: artPlaceholderImages[24],
         images: [artZoomImages[24]],
         placeholders: [artZoomPlaceholders[24]]
+    },
+    {
+        id: 24,
+        title: 'asdf',
+        dimensions: '16x20',
+        medium: 'Oil on Canvas Paper',
+        year: 2024,
+        image: artThumbnails[27],
+        placeholder: artPlaceholderImages[27],
+        images: [artZoomImages[27]],
+        placeholders: [artZoomPlaceholders[27]]
+    },
+    {
+        id: 25,
+        title: 'asdf',
+        dimensions: '16x20',
+        medium: 'Oil on Canvas Paper',
+        year: 2024,
+        image: artThumbnails[28],
+        placeholder: artPlaceholderImages[28],
+        images: [artZoomImages[28]],
+        placeholders: [artZoomPlaceholders[28]]
+    },
+    {
+        id: 27,
+        title: 'asd3f',
+        dimensions: '16x20',
+        medium: 'Oil on Canvas Paper',
+        year: 2024,
+        image: artThumbnails[29],
+        placeholder: artPlaceholderImages[29],
+        images: [artZoomImages[29]],
+        placeholders: [artZoomPlaceholders[29]]
     }
 ];
 

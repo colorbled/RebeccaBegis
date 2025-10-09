@@ -22,6 +22,10 @@ const artPlaceholderImages = {
     22: "/assets/art/placeholders/22.jpg",
     23: "/assets/art/placeholders/23.jpg",
     24: "/assets/art/placeholders/24.jpg",
+    26: "/assets/art/placeholders/26.jpg",
+    27: "/assets/art/placeholders/27.jpg",
+    28: "/assets/art/placeholders/28.jpg",
+    29: "/assets/art/placeholders/29.jpg",
 };
 
 export default artPlaceholderImages;
