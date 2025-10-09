@@ -6,6 +6,7 @@ import Header from './Header';
 import Home from './pages/Home';
 import About from './pages/About';
 import Contact from './pages/Contact';
+import Admin from './pages/admin/';
 import Footer from './Footer';
 
 function AppRoutes() {
@@ -18,6 +19,7 @@ function AppRoutes() {
                 <Route path="/" element={<Home />} />
                 <Route path="/about" element={<About />} />
                 <Route path="/contact" element={<Contact />} />
+                <Route path="/admin" element={<Admin />} />
                 <Route path="*" element={<Navigate to="/" replace />} />
             </Routes>
         </Layout>
