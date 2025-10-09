@@ -6,8 +6,8 @@ import SoldList from './components/SoldList';
 import ExpenseForm from './components/ExpenseForm';
 import ExpenseList from './components/ExpenseList';
 import Money from './ui/Money';
-import { useLocalJson } from './hooks/useLocalJson';
-import { LS_KEYS } from './storage';
+import { useRemoteTable } from './hooks/useRemoteTable';
+import AuthGate from './components/AuthGate';
 
 // --- tiny helper for optional CSV export (kept local to the page) ---
 function exportCsv(filename, rows) {
@@ -35,41 +35,16 @@ function exportCsv(filename, rows) {
 export default function Admin() {
     const [tab, setTab] = useState('sold');
 
-    const [sold, setSold] = useLocalJson(LS_KEYS.sold, []);
+    // Remote tables (no local setState for arrays)
+    const { rows: sold, upsert: upsertSold, remove: removeSold } = useRemoteTable('sold');
     const [editingSold, setEditingSold] = useState(null);
 
-    const [expenses, setExpenses] = useLocalJson(LS_KEYS.expenses, []);
+    const { rows: expenses, upsert: upsertExpense, remove: removeExpense } = useRemoteTable('expenses');
     const [editingExpense, setEditingExpense] = useState(null);
 
     const soldTotal = useMemo(() => sold.reduce((s, i) => s + Number(i.price || 0), 0), [sold]);
     const expensesTotal = useMemo(() => expenses.reduce((s, i) => s + Number(i.amount || 0), 0), [expenses]);
     const net = soldTotal - expensesTotal;
-
-    const upsertSold = (record) => {
-        setSold((prev) => {
-            const ix = prev.findIndex((p) => p.id === record.id);
-            if (ix === -1) return [record, ...prev];
-            const next = prev.slice();
-            next[ix] = record;
-            return next;
-        });
-        setEditingSold(null);
-    };
-
-    const removeSold = (id) => setSold((prev) => prev.filter((p) => p.id !== id));
-
-    const upsertExpense = (record) => {
-        setExpenses((prev) => {
-            const ix = prev.findIndex((p) => p.id === record.id);
-            if (ix === -1) return [record, ...prev];
-            const next = prev.slice();
-            next[ix] = record;
-            return next;
-        });
-        setEditingExpense(null);
-    };
-
-    const removeExpense = (id) => setExpenses((prev) => prev.filter((p) => p.id !== id));
 
     // --- UI helpers (purely visual) ---
     const Card = ({ tone = 'zinc', icon: Icon, label, value, hint }) => {
@@ -107,7 +82,7 @@ export default function Admin() {
         );
     };
 
-    // Mobile-first sticky toolbar; now independent of tabs (tabs moved below KPIs)
+    // Mobile-first sticky toolbar
     const Toolbar = ({ left, right }) => (
         <div className="sticky top-0 z-[1] -mx-6 md:-mx-5 -mt-3 md:-mt-5 px-6 md:px-5 py-3 bg-black/30 backdrop-blur supports-[backdrop-filter]:backdrop-blur-md border-b border-white/5">
             <div className="flex flex-col md:flex-row md:items-center gap-3 md:gap-4 md:justify-between">
@@ -136,133 +111,146 @@ export default function Admin() {
     );
 
     return (
-        <div className="p-6 md:p-10 max-w-7xl mx-auto">
-            {/* Header (title + subtext on their own line/section) */}
-            <header className="mb-4 md:mb-6">
-                <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin</h1>
-                <p className="mt-1 text-sm text-zinc-400">Sales &amp; studio expenditures</p>
-            </header>
+        <AuthGate>
+            <div className="p-6 md:p-10 max-w-7xl mx-auto">
+                {/* Header */}
+                <header className="mb-4 md:mb-6">
+                    <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin</h1>
+                    <p className="mt-1 text-sm text-zinc-400">Sales &amp; studio expenditures</p>
+                </header>
 
-            {/* KPI strip (mobile-first grid) */}
-            <section className="mt-4 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
-                <Card
-                    tone="emerald"
-                    icon={DollarSign}
-                    label="Sales"
-                    value={<Money value={soldTotal} />}
-                    hint={sold.length ? `${sold.length} sale${sold.length > 1 ? 's' : ''}` : 'No sales yet'}
-                />
-                <Card
-                    tone="amber"
-                    icon={Wallet}
-                    label="Expenses"
-                    value={<Money value={expensesTotal} />}
-                    hint={expenses.length ? `${expenses.length} record${expenses.length > 1 ? 's' : ''}` : 'No expenses yet'}
-                />
-                <Card
-                    tone="cyan"
-                    icon={TrendingUp}
-                    label="Net"
-                    value={<Money value={net} />}
-                    hint={net >= 0 ? 'In the green' : 'In the red'}
-                />
-            </section>
-
-            {/* Refined Tab Navigation (under KPIs, minimal/transparent look) */}
-            <nav aria-label="Sections" className="mt-4 md:mt-6 mb-6 md:mb-8">
-                <div className="rounded-xl border border-white/10 bg-white/[0.02] p-1 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
-                    <TabNav
-                        value={tab}
-                        onChange={setTab}
-                        tabs={[
-                            { value: 'sold', label: 'Paintings Sold' },
-                            { value: 'expenses', label: 'Expenditures' },
-                        ]}
+                {/* KPI strip */}
+                <section className="mt-4 md:mt-6 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 md:gap-4">
+                    <Card
+                        tone="emerald"
+                        icon={DollarSign}
+                        label="Sales"
+                        value={<Money value={soldTotal} />}
+                        hint={sold.length ? `${sold.length} sale${sold.length > 1 ? 's' : ''}` : 'No sales yet'}
                     />
-                </div>
-            </nav>
+                    <Card
+                        tone="amber"
+                        icon={Wallet}
+                        label="Expenses"
+                        value={<Money value={expensesTotal} />}
+                        hint={expenses.length ? `${expenses.length} record${expenses.length > 1 ? 's' : ''}` : 'No expenses yet'}
+                    />
+                    <Card
+                        tone="cyan"
+                        icon={TrendingUp}
+                        label="Net"
+                        value={<Money value={net} />}
+                        hint={net >= 0 ? 'In the green' : 'In the red'}
+                    />
+                </section>
 
-            {/* Panels */}
-            <main className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur p-5 md:p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
-                {tab === 'sold' ? (
-                    <div className="grid gap-6">
-                        {/* Sticky toolbar */}
-                        <Toolbar
-                            left={<h2 className="text-base md:text-lg font-semibold">Paintings Sold</h2>}
-                            right={
-                                <>
-                                    <GhostBtn onClick={() => exportCsv('paintings-sold.csv', sold)}>
-                                        <Download className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Export CSV</span>
-                                    </GhostBtn>
-                                    <PrimaryBtn onClick={() => setEditingSold({})}>
-                                        <Plus className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Add Sale</span>
-                                        <span className="sm:hidden">Add</span>
-                                    </PrimaryBtn>
-                                </>
-                            }
-                        />
-
-                        {editingSold && (
-                            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-                                    <div className="font-medium">{editingSold?.id ? 'Edit Sale' : 'New Sale'}</div>
-                                    <GhostBtn onClick={() => setEditingSold(null)} title="Close">
-                                        <X className="w-4 h-4" />
-                                        Close
-                                    </GhostBtn>
-                                </div>
-                                <SoldForm initial={editingSold?.id ? editingSold : undefined} onSave={upsertSold} />
-                            </div>
-                        )}
-
-                        <SoldList
-                            items={[...sold].sort((a, b) => (b.date || '').localeCompare(a.date || ''))}
-                            onEdit={setEditingSold}
-                            onDelete={removeSold}
+                {/* Tab Navigation under KPIs */}
+                <nav aria-label="Sections" className="mt-4 md:mt-6 mb-6 md:mb-8">
+                    <div className="rounded-xl border border-white/10 bg-white/[0.02] p-1 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+                        <TabNav
+                            value={tab}
+                            onChange={setTab}
+                            tabs={[
+                                { value: 'sold', label: 'Paintings Sold' },
+                                { value: 'expenses', label: 'Expenditures' },
+                            ]}
                         />
                     </div>
-                ) : (
-                    <div className="grid gap-6">
-                        <Toolbar
-                            left={<h2 className="text-base md:text-lg font-semibold">Expenditures</h2>}
-                            right={
-                                <>
-                                    <GhostBtn onClick={() => exportCsv('expenditures.csv', expenses)}>
-                                        <Download className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Export CSV</span>
-                                    </GhostBtn>
-                                    <PrimaryBtn onClick={() => setEditingExpense({})}>
-                                        <Plus className="h-4 w-4" />
-                                        <span className="hidden sm:inline">Add Expense</span>
-                                        <span className="sm:hidden">Add</span>
-                                    </PrimaryBtn>
-                                </>
-                            }
-                        />
+                </nav>
 
-                        {editingExpense && (
-                            <div className="rounded-xl border border-white/10 bg-white/5 p-4">
-                                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-                                    <div className="font-medium">{editingExpense?.id ? 'Edit Expense' : 'New Expense'}</div>
-                                    <GhostBtn onClick={() => setEditingExpense(null)} title="Close">
-                                        <X className="w-4 h-4" />
-                                        Close
-                                    </GhostBtn>
+                {/* Panels */}
+                <main className="rounded-2xl border border-white/10 bg-white/[0.04] backdrop-blur p-5 md:p-5 shadow-[inset_0_1px_0_0_rgba(255,255,255,0.06)]">
+                    {tab === 'sold' ? (
+                        <div className="grid gap-6">
+                            <Toolbar
+                                left={<h2 className="text-base md:text-lg font-semibold">Paintings Sold</h2>}
+                                right={
+                                    <>
+                                        <GhostBtn onClick={() => exportCsv('paintings-sold.csv', sold)}>
+                                            <Download className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Export CSV</span>
+                                        </GhostBtn>
+                                        <PrimaryBtn onClick={() => setEditingSold({})}>
+                                            <Plus className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Add Sale</span>
+                                            <span className="sm:hidden">Add</span>
+                                        </PrimaryBtn>
+                                    </>
+                                }
+                            />
+
+                            {editingSold && (
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                                        <div className="font-medium">{editingSold?.id ? 'Edit Sale' : 'New Sale'}</div>
+                                        <GhostBtn onClick={() => setEditingSold(null)} title="Close">
+                                            <X className="w-4 h-4" />
+                                            Close
+                                        </GhostBtn>
+                                    </div>
+                                    <SoldForm
+                                        initial={editingSold?.id ? editingSold : undefined}
+                                        onSave={async (rec) => {
+                                            await upsertSold(rec);
+                                            setEditingSold(null);
+                                        }}
+                                    />
                                 </div>
-                                <ExpenseForm initial={editingExpense?.id ? editingExpense : undefined} onSave={upsertExpense} />
-                            </div>
-                        )}
+                            )}
 
-                        <ExpenseList
-                            items={[...expenses].sort((a, b) => (b.date || '').localeCompare(a.date || ''))}
-                            onEdit={setEditingExpense}
-                            onDelete={removeExpense}
-                        />
-                    </div>
-                )}
-            </main>
-        </div>
+                            <SoldList
+                                items={[...sold].sort((a, b) => (b.date || '').localeCompare(a.date || ''))}
+                                onEdit={setEditingSold}
+                                onDelete={removeSold}
+                            />
+                        </div>
+                    ) : (
+                        <div className="grid gap-6">
+                            <Toolbar
+                                left={<h2 className="text-base md:text-lg font-semibold">Expenditures</h2>}
+                                right={
+                                    <>
+                                        <GhostBtn onClick={() => exportCsv('expenditures.csv', expenses)}>
+                                            <Download className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Export CSV</span>
+                                        </GhostBtn>
+                                        <PrimaryBtn onClick={() => setEditingExpense({})}>
+                                            <Plus className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Add Expense</span>
+                                            <span className="sm:hidden">Add</span>
+                                        </PrimaryBtn>
+                                    </>
+                                }
+                            />
+
+                            {editingExpense && (
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                                        <div className="font-medium">{editingExpense?.id ? 'Edit Expense' : 'New Expense'}</div>
+                                        <GhostBtn onClick={() => setEditingExpense(null)} title="Close">
+                                            <X className="w-4 h-4" />
+                                            Close
+                                        </GhostBtn>
+                                    </div>
+                                    <ExpenseForm
+                                        initial={editingExpense?.id ? editingExpense : undefined}
+                                        onSave={async (rec) => {
+                                            await upsertExpense(rec);
+                                            setEditingExpense(null);
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            <ExpenseList
+                                items={[...expenses].sort((a, b) => (b.date || '').localeCompare(a.date || ''))}
+                                onEdit={setEditingExpense}
+                                onDelete={removeExpense}
+                            />
+                        </div>
+                    )}
+                </main>
+            </div>
+        </AuthGate>
     );
 }
