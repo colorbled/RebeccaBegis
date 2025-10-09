@@ -5,6 +5,7 @@ import ConfirmDialog from '../ui/ConfirmDialog';
 
 /**
  * Try very hard to find a usable URL for a record's image.
+ * Now supports snake_case keys like image_url/thumbnail_url/etc.
  * You can override by passing a `getImage` prop to this component.
  */
 function getThumb(rec) {
@@ -12,7 +13,11 @@ function getThumb(rec) {
 
     // 1) Direct scalar string fields
     const scalarKeys = [
-        'thumbnail', 'thumb', 'thumbUrl', 'preview', 'image', 'imageUrl', 'photo', 'photoUrl', 'url', 'src', 'dataUrl', 'localUrl'
+        // camelCase
+        'thumbnail', 'thumb', 'thumbUrl', 'preview', 'image', 'imageUrl', 'photo', 'photoUrl',
+        'url', 'src', 'dataUrl', 'localUrl',
+        // snake_case
+        'image_url', 'thumbnail_url', 'thumb_url', 'preview_url', 'photo_url', 'receipt_url',
     ];
     for (const k of scalarKeys) {
         const v = rec[k];
@@ -20,19 +25,25 @@ function getThumb(rec) {
     }
 
     // 2) Direct nested objects with common url-ish keys
-    const objKeys = ['thumbnail', 'thumb', 'image', 'photo', 'cover', 'media', 'receipt', 'file'];
-    const urlLikeKeys = ['url', 'src', 'dataUrl', 'localUrl', 'preview'];
+    const objKeys = ['thumbnail','thumb','image','photo','cover','media','receipt','file'];
+    const urlLikeKeys = [
+        // camelCase
+        'url','src','dataUrl','localUrl','preview','previewUrl','dataURL',
+        // snake_case
+        'image_url','thumbnail_url','thumb_url','preview_url','photo_url','receipt_url',
+    ];
     for (const k of objKeys) {
         const v = rec[k];
         if (v && typeof v === 'object') {
             for (const uk of urlLikeKeys) {
-                if (typeof v[uk] === 'string' && v[uk]) return v[uk];
+                const s = v?.[uk];
+                if (typeof s === 'string' && s) return s;
             }
         }
     }
 
-    // 3) Arrays that might contain strings or objects ({url|src|dataUrl})
-    const arrayKeys = ['photos', 'images', 'files', 'attachments', 'receipts', 'media', 'pictures'];
+    // 3) Arrays that might contain strings or objects ({url|src|dataUrl|image_url})
+    const arrayKeys = ['photos','images','files','attachments','receipts','media','pictures'];
     for (const a of arrayKeys) {
         const arr = rec[a];
         if (Array.isArray(arr) && arr.length) {
@@ -40,7 +51,8 @@ function getThumb(rec) {
             for (const item of arr) {
                 if (item && typeof item === 'object') {
                     for (const uk of urlLikeKeys) {
-                        if (typeof item[uk] === 'string' && item[uk]) return item[uk];
+                        const s = item?.[uk];
+                        if (typeof s === 'string' && s) return s;
                     }
                 } else if (typeof item === 'string' && item) {
                     return item;
@@ -76,14 +88,8 @@ export default function SoldList({ items = [], onEdit, onDelete, getImage }) {
     const [confirmOpen, setConfirmOpen] = React.useState(false);
     const [pending, setPending] = React.useState(null);
 
-    const openConfirm = (rec) => {
-        setPending(rec);
-        setConfirmOpen(true);
-    };
-
-    const doDelete = () => {
-        if (pending) onDelete?.(pending.id);
-    };
+    const openConfirm = (rec) => { setPending(rec); setConfirmOpen(true); };
+    const doDelete = () => { if (pending) onDelete?.(pending.id); };
 
     if (!items.length) return <Empty />;
 

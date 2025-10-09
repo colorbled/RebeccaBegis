@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { Plus, X, DollarSign, Wallet, TrendingUp, Download } from 'lucide-react';
+import { Plus, X, DollarSign, Wallet, TrendingUp, Download, LogOut } from 'lucide-react';
 import TabNav from './components/TabNav';
 import SoldForm from './components/SoldForm';
 import SoldList from './components/SoldList';
@@ -8,6 +8,7 @@ import ExpenseList from './components/ExpenseList';
 import Money from './ui/Money';
 import { useRemoteTable } from './hooks/useRemoteTable';
 import AuthGate from './components/AuthGate';
+import { supabase } from './lib/supabaseClient'; // ⬅️ adjust the path if your client lives elsewhere
 
 // --- tiny helper for optional CSV export (kept local to the page) ---
 function exportCsv(filename, rows) {
@@ -26,9 +27,7 @@ function exportCsv(filename, rows) {
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.click();
+    a.href = url; a.download = filename; a.click();
     URL.revokeObjectURL(url);
 }
 
@@ -110,13 +109,30 @@ export default function Admin() {
         </button>
     );
 
+    const SignOutBtn = () => (
+        <button
+            onClick={async () => { await supabase.auth.signOut(); }}
+            className="inline-flex items-center gap-2 rounded-lg border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-2 text-sm"
+            title="Sign out"
+            aria-label="Sign out"
+        >
+            <LogOut className="h-4 w-4" />
+            <span className="hidden sm:inline">Sign out</span>
+        </button>
+    );
+
     return (
         <AuthGate>
             <div className="p-6 md:p-10 max-w-7xl mx-auto">
                 {/* Header */}
                 <header className="mb-4 md:mb-6">
-                    <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin</h1>
-                    <p className="mt-1 text-sm text-zinc-400">Sales &amp; studio expenditures</p>
+                    <div className="flex items-start justify-between gap-3">
+                        <div>
+                            <h1 className="text-2xl md:text-3xl font-semibold tracking-tight">Admin</h1>
+                            <p className="mt-1 text-sm text-zinc-400">Sales &amp; studio expenditures</p>
+                        </div>
+                        <SignOutBtn />
+                    </div>
                 </header>
 
                 {/* KPI strip */}
