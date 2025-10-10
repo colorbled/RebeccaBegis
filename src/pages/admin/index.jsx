@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Plus, X, DollarSign, Wallet, TrendingUp, Download, LogOut } from 'lucide-react';
 import TabNav from './components/TabNav';
 import SoldForm from './components/SoldForm';
@@ -33,6 +33,25 @@ function exportCsv(filename, rows) {
 
 export default function Admin() {
     const [tab, setTab] = useState('sold');
+
+    // 🚫 Tell crawlers not to index this page (no dependency).
+    useEffect(() => {
+        const robots = document.createElement('meta');
+        robots.name = 'robots';
+        robots.content = 'noindex,nofollow,noarchive';
+
+        const googlebot = document.createElement('meta');
+        googlebot.name = 'googlebot';
+        googlebot.content = 'noindex,nofollow,noarchive';
+
+        document.head.appendChild(robots);
+        document.head.appendChild(googlebot);
+
+        return () => {
+            document.head.removeChild(robots);
+            document.head.removeChild(googlebot);
+        };
+    }, []);
 
     // Remote tables (no local setState for arrays)
     const { rows: sold, upsert: upsertSold, remove: removeSold } = useRemoteTable('sold');
