@@ -18,9 +18,9 @@ function noJekyllPlugin() {
 }
 
 export default defineConfig(({ mode }) => {
-    // Ensure env vars from .env.* are loaded here
+    // Load env (so VITE_BASE_PATH works from .env.*)
     const env = loadEnv(mode, process.cwd(), '');
-    // Default to "/" (custom domain). Override with VITE_BASE_PATH for project pages.
+    // Default to "/" (custom domain). Override with VITE_BASE_PATH for project pages if needed.
     let base = env.VITE_BASE_PATH || '/';
     if (!base.endsWith('/')) base += '/';
 
@@ -45,8 +45,8 @@ export default defineConfig(({ mode }) => {
                     theme_color: '#0b0b0c',
                     background_color: '#0b0b0c',
                     display: 'standalone',
-                    start_url: base,   // matches deployed base
-                    scope: base,       // matches deployed base
+                    start_url: base,
+                    scope: base,
                     icons: [
                         { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
                         { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -54,11 +54,29 @@ export default defineConfig(({ mode }) => {
                     ]
                 },
                 workbox: {
-                    // MUST be relative so it matches the precache key
+                    // Keep relative so it matches the precache entry
                     navigateFallback: 'index.html',
                     navigateFallbackDenylist: [/^assets\//],
+
+                    // ✅ Runtime caching for images that are served from YOUR app (same-origin).
+                    // This covers images in /public and any built assets requested at runtime.
+                    runtimeCaching: [
+                        {
+                            urlPattern: ({ sameOrigin, request }) =>
+                                sameOrigin && request.destination === 'image',
+                            handler: 'CacheFirst',
+                            options: {
+                                cacheName: 'images-same-origin',
+                                expiration: {
+                                    maxEntries: 300,
+                                    maxAgeSeconds: 60 * 60 * 24 * 30 // 30 days
+                                },
+                                cacheableResponse: { statuses: [200] }
+                            }
+                        }
+                    ]
                 },
-                // Only enable the dev SW in development
+                // Dev SW only in development
                 devOptions: { enabled: mode === 'development' }
             }),
             noJekyllPlugin(),
