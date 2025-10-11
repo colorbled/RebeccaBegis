@@ -34,6 +34,7 @@ export default defineConfig(({ mode }) => {
         plugins: [
             react(),
             tailwindcss(),
+// vite.config.js (only the VitePWA part shown)
             VitePWA({
                 registerType: 'autoUpdate',
                 includeAssets: [
@@ -50,8 +51,8 @@ export default defineConfig(({ mode }) => {
                     theme_color: '#0b0b0c',
                     background_color: '#0b0b0c',
                     display: 'standalone',
-                    start_url: `${base}`,  // must match your deployed base path
-                    scope: `${base}`,
+                    start_url: `${base}`,   // keep base here
+                    scope: `${base}`,       // keep base here
                     icons: [
                         { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
                         { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -59,9 +60,10 @@ export default defineConfig(({ mode }) => {
                     ]
                 },
                 workbox: {
-                    // Ensure deep links work offline on Pages
-                    navigateFallback: `${base}index.html`,
-                    globIgnores: ['**/*.map', '**/node_modules/**/*']
+                    // ❗ Use relative path so it matches the precache entry
+                    navigateFallback: 'index.html',
+                    // optional: avoid picking SPA assets as navigations
+                    navigateFallbackDenylist: [/^\/assets\//],
                 },
                 devOptions: { enabled: true }
             }),
