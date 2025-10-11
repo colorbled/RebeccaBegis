@@ -47,7 +47,6 @@ function getThumb(rec) {
     for (const a of arrayKeys) {
         const arr = rec[a];
         if (Array.isArray(arr) && arr.length) {
-            // prefer objects that have a url-ish key; else fall back to first string
             for (const item of arr) {
                 if (item && typeof item === 'object') {
                     for (const uk of urlLikeKeys) {
@@ -62,7 +61,6 @@ function getThumb(rec) {
     }
 
     // 4) Common upload shapes saved from inputs
-    // e.g. { file: { name, type, dataUrl } } OR { fileList: [{ dataUrl }] }
     if (rec.file?.dataUrl) return rec.file.dataUrl;
     if (Array.isArray(rec.fileList) && rec.fileList[0]?.dataUrl) return rec.fileList[0].dataUrl;
 
@@ -84,6 +82,54 @@ const Field = ({ label, children }) => (
     </div>
 );
 
+/** Helpers to work in INCHES first, with graceful fallback from feet */
+function getDimsInches(rec) {
+    let wIn = rec?.width_in;
+    let hIn = rec?.height_in;
+    if ((wIn == null || hIn == null) && (rec?.width_ft != null || rec?.height_ft != null)) {
+        if (wIn == null && rec?.width_ft != null) wIn = Number(rec.width_ft) * 12;
+        if (hIn == null && rec?.height_ft != null) hIn = Number(rec.height_ft) * 12;
+    }
+    const w = Number(wIn);
+    const h = Number(hIn);
+    if (!isFinite(w) || !isFinite(h) || w <= 0 || h <= 0) return null;
+    return { w, h };
+}
+
+function formatDimensionsInches(rec) {
+    const dims = getDimsInches(rec);
+    if (!dims) return null;
+    const fmt = (n) => (Number.isInteger(n) ? String(n) : String(Number(n.toFixed(2)).toString().replace(/\.?0+$/, '')));
+    return `${fmt(dims.w)}x${fmt(dims.h)}`;
+}
+
+function getAreaInches(rec) {
+    const dims = getDimsInches(rec);
+    if (!dims) return null;
+    return dims.w * dims.h;
+}
+
+function formatAreaInches(rec) {
+    const area = getAreaInches(rec);
+    if (area == null) return null;
+    const displayed = Number.isInteger(area)
+        ? area.toLocaleString()
+        : Number(area.toFixed(2)).toLocaleString();
+    return `${displayed} in²`;
+}
+
+function PricePerSqIn({ price, rec }) {
+    const area = getAreaInches(rec);
+    const p = Number(price);
+    if (area == null || !isFinite(p) || p <= 0 || area <= 0) return '—';
+    const val = p / area;
+    return (
+        <>
+            <Money value={val} /> <span className="text-zinc-400">/ in²</span>
+        </>
+    );
+}
+
 export default function SoldList({ items = [], onEdit, onDelete, getImage }) {
     const [confirmOpen, setConfirmOpen] = React.useState(false);
     const [pending, setPending] = React.useState(null);
@@ -102,6 +148,8 @@ export default function SoldList({ items = [], onEdit, onDelete, getImage }) {
                     } = it;
 
                     const thumb = typeof getImage === 'function' ? getImage(it) : getThumb(it);
+                    const dimsIn = formatDimensionsInches(it); // "WxH"
+                    const areaIn = formatAreaInches(it);       // "N in²"
 
                     return (
                         <li key={id} className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden">
@@ -154,8 +202,25 @@ export default function SoldList({ items = [], onEdit, onDelete, getImage }) {
                                     </div>
                                 </div>
 
-                                {(size || medium || sku) ? (
+                                {(size || medium || sku || dimsIn || areaIn) ? (
                                     <div className="mt-3 grid grid-cols-2 gap-2">
+                                        {/* Dimensions */}
+                                        {dimsIn && <Field label="Dimensions">{dimsIn}</Field>}
+
+                                        {/* Square inches (full row under Dimensions) */}
+                                        {areaIn && (
+                                            <div className="col-span-2">
+                                                <Field label="Square Inches">{areaIn}</Field>
+                                            </div>
+                                        )}
+
+                                        {/* Price per square inch (full row under area) */}
+                                        <div className="col-span-2">
+                                            <Field label="Price per square inch">
+                                                <PricePerSqIn price={price} rec={it} />
+                                            </Field>
+                                        </div>
+
                                         {size && <Field label="Size">{size}</Field>}
                                         {medium && <Field label="Medium">{medium}</Field>}
                                         {sku && <Field label="SKU">{sku}</Field>}

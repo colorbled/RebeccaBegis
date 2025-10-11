@@ -12,6 +12,15 @@ export default function SoldForm({ onSave, initial }) {
     const [notes, setNotes] = useState(initial?.notes || '');
     // accept either 'thumb' (old) or 'image_url' (DB column)
     const [thumb, setThumb] = useState(initial?.image_url || initial?.thumb || null);
+
+    // ✅ Dimensions in inches (snake_case first, then common fallbacks)
+    const [widthIn, setWidthIn] = useState(
+        initial?.width_in ?? initial?.widthIn ?? initial?.width ?? ''
+    );
+    const [heightIn, setHeightIn] = useState(
+        initial?.height_in ?? initial?.heightIn ?? initial?.height ?? ''
+    );
+
     const [err, setErr] = useState('');
 
     const submit = async (e) => {
@@ -22,6 +31,10 @@ export default function SoldForm({ onSave, initial }) {
         if (price === '' || isNaN(Number(price))) return setErr('Valid price is required.');
         if (!date) return setErr('Date is required.');
 
+        // Validate optional dimension numbers if provided (inches)
+        if (widthIn !== '' && isNaN(Number(widthIn))) return setErr('Width must be a number (inches).');
+        if (heightIn !== '' && isNaN(Number(heightIn))) return setErr('Height must be a number (inches).');
+
         // Build a DB-friendly payload (snake_case, no createdAt)
         const payload = {
             // Only send id when editing; let DB generate id on create
@@ -31,7 +44,11 @@ export default function SoldForm({ onSave, initial }) {
             buyer: buyer.trim() || null,
             date,
             notes: notes.trim() || null,
-            image_url: thumb || null, // ✅ matches Supabase column
+            image_url: thumb || null, // ✅ matches DB column
+
+            // ✅ Dimensions in inches (null if empty)
+            width_in: widthIn === '' ? null : Number(widthIn),
+            height_in: heightIn === '' ? null : Number(heightIn),
         };
 
         try {
@@ -74,6 +91,26 @@ export default function SoldForm({ onSave, initial }) {
                         type="date"
                         value={date}
                         onChange={(e) => setDate(e.target.value)}
+                    />
+                </Field>
+
+                {/* ✅ Dimensions (inches) */}
+                <Field label="Width (in)">
+                    <TextInput
+                        inputMode="decimal"
+                        step="0.01"
+                        value={widthIn}
+                        onChange={(e) => setWidthIn(e.target.value)}
+                        placeholder="e.g., 16"
+                    />
+                </Field>
+                <Field label="Height (in)">
+                    <TextInput
+                        inputMode="decimal"
+                        step="0.01"
+                        value={heightIn}
+                        onChange={(e) => setHeightIn(e.target.value)}
+                        placeholder="e.g., 20"
                     />
                 </Field>
 

@@ -5,11 +5,13 @@ import { supabase } from '../lib/supabaseClient';
 const TABLE_COLUMNS = {
     sold: [
         'id','user_id','title','buyer','date','price','size','medium','notes','series','sku',
-        'image_url','created_at'
+        'image_url','created_at',
+        // ✅ dimensions in inches
+        'width_in','height_in',
     ],
     expenses: [
-         'id','user_id','vendor','category','date','amount','description','paymentMethod','receiptId',
-         'image_url','notes','created_at'
+        'id','user_id','vendor','category','date','amount','description','paymentMethod','receiptId',
+        'image_url','notes','created_at'
     ],
 };
 
@@ -19,15 +21,22 @@ function toDbShape(table, rec) {
     const out = { ...rec };
 
     // normalize common camelCase -> snake_case
-    if ('createdAt' in out) { out.created_at = out.createdAt; delete out.createdAt; }
-    if ('updatedAt' in out) { out.updated_at = out.updatedAt; delete out.updatedAt; }
-    if ('imageUrl'  in out) { out.image_url  = out.imageUrl;  delete out.imageUrl;  }
-    if ('receiptUrl'in out) { out.receipt_url= out.receiptUrl;delete out.receiptUrl; }
+    if ('createdAt'  in out) { out.created_at  = out.createdAt;  delete out.createdAt;  }
+    if ('updatedAt'  in out) { out.updated_at  = out.updatedAt;  delete out.updatedAt;  }
+    if ('imageUrl'   in out) { out.image_url   = out.imageUrl;   delete out.imageUrl;   }
+    if ('receiptUrl' in out) { out.receipt_url = out.receiptUrl; delete out.receiptUrl; }
 
-    // OPTIONAL: If your UI uses nested image blobs, you might map them here into image_url strings
+    // ✅ dimensions (support camelCase from UI or snake_case already) — inches
+    if ('widthIn'  in out) { out.width_in  = out.widthIn;  delete out.widthIn;  }
+    if ('heightIn' in out) { out.height_in = out.heightIn; delete out.heightIn; }
 
-    // add user_id if missing
-    // (caller must ensure user is available)
+    // ✅ legacy safety: if feet values appear, convert to inches when inch fields missing
+    if ('width_ft'  in out && out.width_ft  != null && out.width_in  == null) out.width_in  = Math.round(Number(out.width_ft)  * 12);
+    if ('height_ft' in out && out.height_ft != null && out.height_in == null) out.height_in = Math.round(Number(out.height_ft) * 12);
+    delete out.width_ft;
+    delete out.height_ft;
+
+    // add user_id if missing (caller ensures user is available)
     return out;
 }
 
@@ -35,7 +44,7 @@ function pruneToKnownColumns(table, rec) {
     const cols = TABLE_COLUMNS[table] || [];
     const out = {};
     for (const k of cols) {
-        if (rec[k] !== undefined) out[k] = rec[k];
+        if (rec[k] !== undefined) out[k] = rec[k]; // keep nulls, drop only undefined
     }
     return out;
 }
