@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite';
+import { defineConfig, loadEnv } from 'vite';
 import react from '@vitejs/plugin-react';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -17,24 +17,18 @@ function noJekyllPlugin() {
     };
 }
 
-/**
- * Base path:
- * - Dev: "/"
- * - GH Pages: "/<repo>/"  (set with VITE_BASE_PATH in .env.production)
- *   e.g. VITE_BASE_PATH=/rebecca-begis-site/
- */
-const BASE = process.env.VITE_BASE_PATH || '/RebeccaBegis/'; // ← replace <repo> or set env
-
 export default defineConfig(({ mode }) => {
-    const isProd = mode === 'production';
-    const base = isProd ? BASE : '/';
+    // Ensure env vars from .env.* are loaded here
+    const env = loadEnv(mode, process.cwd(), '');
+    // Default to "/" (custom domain). Override with VITE_BASE_PATH for project pages.
+    let base = env.VITE_BASE_PATH || '/';
+    if (!base.endsWith('/')) base += '/';
 
     return {
         base,
         plugins: [
             react(),
             tailwindcss(),
-// vite.config.js (only the VitePWA part shown)
             VitePWA({
                 registerType: 'autoUpdate',
                 includeAssets: [
@@ -51,8 +45,8 @@ export default defineConfig(({ mode }) => {
                     theme_color: '#0b0b0c',
                     background_color: '#0b0b0c',
                     display: 'standalone',
-                    start_url: `${base}`,   // keep base here
-                    scope: `${base}`,       // keep base here
+                    start_url: base,   // matches deployed base
+                    scope: base,       // matches deployed base
                     icons: [
                         { src: 'icons/icon-192.png', sizes: '192x192', type: 'image/png' },
                         { src: 'icons/icon-512.png', sizes: '512x512', type: 'image/png' },
@@ -60,18 +54,18 @@ export default defineConfig(({ mode }) => {
                     ]
                 },
                 workbox: {
-                    // ❗ Use relative path so it matches the precache entry
+                    // MUST be relative so it matches the precache key
                     navigateFallback: 'index.html',
-                    // optional: avoid picking SPA assets as navigations
-                    navigateFallbackDenylist: [/^\/assets\//],
+                    navigateFallbackDenylist: [/^assets\//],
                 },
-                devOptions: { enabled: true }
+                // Only enable the dev SW in development
+                devOptions: { enabled: mode === 'development' }
             }),
-            noJekyllPlugin()
+            noJekyllPlugin(),
         ],
         build: {
             outDir: 'dist',
-            emptyOutDir: true
-        }
+            emptyOutDir: true,
+        },
     };
 });
