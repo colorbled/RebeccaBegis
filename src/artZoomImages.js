@@ -25,6 +25,7 @@ const artZoomImages = {
     27: "/assets/art/zoom/27.jpg",
     28: "/assets/art/zoom/28.jpg",
     29: "/assets/art/zoom/29.jpg",
+    30: "/assets/art/zoom/30.jpg",
 };
 
 export default artZoomImages;

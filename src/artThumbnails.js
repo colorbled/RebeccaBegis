@@ -26,6 +26,7 @@ const artThumbnails = {
     27: "/assets/art/thumbnails/27.jpg",
     28: "/assets/art/thumbnails/28.jpg",
     29: "/assets/art/thumbnails/29.jpg",
+    30: "/assets/art/thumbnails/30.jpg",
 };
 
 export default artThumbnails;

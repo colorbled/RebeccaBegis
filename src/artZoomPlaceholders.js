@@ -26,6 +26,7 @@ const artZoomPlaceholders = {
     27: "/assets/art/zoom/placeholders/27.jpg",
     28: "/assets/art/zoom/placeholders/28.jpg",
     29: "/assets/art/zoom/placeholders/29.jpg",
+    30: "/assets/art/zoom/placeholders/30.jpg",
 };
 
 export default artZoomPlaceholders;

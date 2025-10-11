@@ -17,7 +17,7 @@ const artworkData = [
         images: [artZoomImages[5]],
         placeholders: [artZoomPlaceholders[5]]
     },
-
+/*
     {
         id: 26,
         title: 'asdf',
@@ -29,7 +29,7 @@ const artworkData = [
         images: [artZoomImages[26]],
         placeholders: [artZoomPlaceholders[26]]
     },
-
+*/
     // Sorted 2025 works
     {
         id: 10,
@@ -266,10 +266,10 @@ const artworkData = [
     },
     {
         id: 24,
-        title: 'asdf',
-        dimensions: '16x20',
-        medium: 'Oil on Canvas Paper',
-        year: 2024,
+        title: 'Dementia Death in the Neuron Forest',
+        dimensions: '27x30.5',
+        medium: 'Oil on Stretched Canvas',
+        year: 2008,
         image: artThumbnails[27],
         placeholder: artPlaceholderImages[27],
         images: [artZoomImages[27]],
@@ -277,10 +277,10 @@ const artworkData = [
     },
     {
         id: 25,
-        title: 'asdf',
-        dimensions: '16x20',
-        medium: 'Oil on Canvas Paper',
-        year: 2024,
+        title: 'Woman and Peaches',
+        dimensions: '26x26',
+        medium: 'Oil on Stretched Canvas',
+        year: 2008,
         image: artThumbnails[28],
         placeholder: artPlaceholderImages[28],
         images: [artZoomImages[28]],
@@ -288,14 +288,25 @@ const artworkData = [
     },
     {
         id: 27,
-        title: 'asd3f',
-        dimensions: '16x20',
-        medium: 'Oil on Canvas Paper',
-        year: 2024,
+        title: 'Grave Digger',
+        dimensions: '36x36',
+        medium: 'Oil on Stretched Canvas',
+        year: 2008,
         image: artThumbnails[29],
         placeholder: artPlaceholderImages[29],
         images: [artZoomImages[29]],
         placeholders: [artZoomPlaceholders[29]]
+    },
+    {
+        id: 28,
+        title: 'Dead Deer',
+        dimensions: '36.6x49',
+        medium: 'Oil on Stretched Canvas',
+        year: 2008,
+        image: artThumbnails[30],
+        placeholder: artPlaceholderImages[30],
+        images: [artZoomImages[30]],
+        placeholders: [artZoomPlaceholders[30]]
     }
 ];
 
