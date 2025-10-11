@@ -1,14 +1,26 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/RebeccaBegis/favicon.png" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Rebecca Begis</title>
-    <script type="module" crossorigin src="/RebeccaBegis/assets/index-Dt3CC75E.js"></script>
-    <link rel="stylesheet" crossorigin href="/RebeccaBegis/assets/index-CfHU5B3t.css">
-  <link rel="manifest" href="/RebeccaBegis/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/RebeccaBegis/registerSW.js"></script></head>
-  <body>
-    <div id="root"></div>
-  </body>
+<head>
+  <meta charset="UTF-8" />
+  <!-- Correct MIME for PNG favicon -->
+  <link rel="icon" type="image/png" href="/RebeccaBegis/favicon.png" />
+
+  <!-- PWA: web app manifest + theme color -->
+  <link rel="manifest" href="/manifest.webmanifest" />
+  <meta name="theme-color" content="#0b0b0c" />
+
+  <!-- (Optional but nice for iOS homescreen) -->
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Rebecca Begis</title>
+  <script type="module" crossorigin src="/RebeccaBegis/assets/index-Dt3CC75E.js"></script>
+  <link rel="stylesheet" crossorigin href="/RebeccaBegis/assets/index-CfHU5B3t.css">
+<link rel="manifest" href="/RebeccaBegis/manifest.webmanifest"><script id="vite-plugin-pwa:register-sw" src="/RebeccaBegis/registerSW.js"></script></head>
+<body>
+<div id="root"></div>
+<!-- Vite will rewrite this for production; fine to keep for dev -->
+</body>
 </html>
