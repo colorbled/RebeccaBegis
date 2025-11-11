@@ -9,6 +9,7 @@ import Money from './ui/Money';
 import { useRemoteTable } from './hooks/useRemoteTable';
 import AuthGate from './components/AuthGate';
 import { supabase } from './lib/supabaseClient'; // ⬅️ adjust the path if your client lives elsewhere
+import CalculatorPanel from './components/CalculatorPanel';
 
 // --- tiny helper for optional CSV export (kept local to the page) ---
 function exportCsv(filename, rows) {
@@ -188,6 +189,7 @@ export default function Admin() {
                             tabs={[
                                 { value: 'sold', label: 'Paintings Sold' },
                                 { value: 'expenses', label: 'Expenditures' },
+                                { value: 'calc', label: 'Calculator' },
                             ]}
                         />
                     </div>
@@ -239,7 +241,7 @@ export default function Admin() {
                                 onDelete={removeSold}
                             />
                         </div>
-                    ) : (
+                    ) : tab === 'expenses' ? (
                         <div className="grid gap-6">
                             <Toolbar
                                 left={<h2 className="text-base md:text-lg font-semibold">Expenditures</h2>}
@@ -283,7 +285,12 @@ export default function Admin() {
                                 onDelete={removeExpense}
                             />
                         </div>
-                    )}
+                    ) : tab === 'calc' ? (
+                        <div className="grid gap-6">
+                            <Toolbar left={<h2 className="text-base md:text-lg font-semibold">Calculator</h2>} right={null} />
+                            <CalculatorPanel />
+                        </div>
+                    ) : null}
                 </main>
             </div>
         </AuthGate>
