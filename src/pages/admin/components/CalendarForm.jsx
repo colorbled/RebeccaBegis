@@ -1,52 +1,167 @@
 import React from 'react';
-import { Check } from 'lucide-react';
+import { Check, Calendar as CalIcon } from 'lucide-react';
 
-const CATEGORIES = ['Gallery','Meetup','Misc.'];
+const CATEGORIES = ['Gallery', 'Meetup', 'Misc.'];
 
-/** Lightweight field wrapper to replace ./ui/fields */
+/** Lightweight field wrapper */
 function FormField({ label, required = false, children }) {
     return (
-        <label className="block">
-      <span className="block text-xs font-medium text-zinc-400 mb-1">
-        {label}{required ? ' *' : ''}
-      </span>
+        <div className="space-y-1">
+            <span className="block text-xs font-medium tracking-wide text-zinc-400">
+                {label}
+                {required ? ' *' : ''}
+            </span>
             {children}
-        </label>
+        </div>
     );
 }
 
-/** Inputs styled like the rest of your admin UI */
+/** Standard text input */
 function TextInput(props) {
+    const { className = '', ...rest } = props;
     return (
         <input
-            {...props}
+            {...rest}
             className={
-                'w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-zinc-100 ' +
-                'placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/10 ' +
-                (props.className || '')
+                'w-full rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm text-zinc-100 ' +
+                'focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/25 ' +
+                'transition-colors ' +
+                className
             }
         />
+    );
+}
+
+/** Date picker "button" that programmatically opens the native date picker */
+function DatePickerButton({ value, onChange }) {
+    const inputRef = React.useRef(null);
+
+    let display = 'Select date';
+    if (value) {
+        const d = new Date(value + 'T00:00:00');
+        if (!Number.isNaN(d.getTime())) {
+            const month = d.toLocaleString('en-US', { month: 'short' });
+            const day = d.getDate();
+            const year = d.getFullYear();
+            display = `${month} ${day}, ${year}`;
+        }
+    }
+
+    const openPicker = () => {
+        const input = inputRef.current;
+        if (!input) return;
+
+        // Modern browsers
+        if (typeof input.showPicker === 'function') {
+            input.showPicker();
+        } else {
+            // Fallback for older / mobile browsers
+            input.focus();
+            input.click();
+        }
+    };
+
+    return (
+        <div className="relative">
+            {/* Visible button-like surface */}
+            <button
+                type="button"
+                onClick={openPicker}
+                className="flex w-full items-center justify-between rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm transition-colors hover:border-white/25 hover:bg-black/50 focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/25"
+            >
+                <span className={value ? 'text-zinc-100' : 'text-zinc-500'}>
+                    {display}
+                </span>
+                <CalIcon className="h-4 w-4 text-zinc-400 shrink-0" />
+            </button>
+
+            {/* Actual date input, visually hidden but used for native picker */}
+            <input
+                ref={inputRef}
+                type="date"
+                value={value}
+                onChange={onChange}
+                className="sr-only"
+                // prevent keyboard editing even if it gets focus
+                onKeyDown={(e) => e.preventDefault()}
+            />
+        </div>
     );
 }
 
 function TextArea(props) {
+    const { className = '', rows, ...rest } = props;
     return (
         <textarea
-            {...props}
+            {...rest}
+            rows={rows ?? 3}
             className={
-                'w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-zinc-100 ' +
-                'placeholder:text-zinc-500 focus:outline-none focus:ring-2 focus:ring-white/10 ' +
-                (props.className || '')
+                'w-full rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm text-zinc-100 ' +
+                'focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/25 ' +
+                'transition-colors ' +
+                className
             }
-            rows={props.rows ?? 3}
         />
+    );
+}
+
+/** Clean, professional category pill buttons */
+function CategoryButtons({ value, onChange }) {
+    const base =
+        'inline-flex items-center justify-center gap-1.5 rounded-full border px-3 py-1.5 text-xs font-medium transition-colors';
+
+    const styles = {
+        'Gallery': {
+            dot: 'bg-sky-400',
+            active: 'border-sky-400/80 bg-sky-500/15 text-sky-100',
+        },
+        'Meetup': {
+            dot: 'bg-amber-400',
+            active: 'border-amber-400/80 bg-amber-500/15 text-amber-50',
+        },
+        'Misc.': {
+            dot: 'bg-zinc-400',
+            active: 'border-zinc-400/80 bg-zinc-700/40 text-zinc-50',
+        },
+    };
+
+    return (
+        <div className="flex flex-wrap gap-2">
+            {CATEGORIES.map((cat) => {
+                const isActive = value === cat;
+                const style = styles[cat];
+                return (
+                    <button
+                        key={cat}
+                        type="button"
+                        onClick={() => onChange(cat)}
+                        className={
+                            base +
+                            ' ' +
+                            (isActive
+                                ? style.active
+                                : 'border-white/12 bg-white/[0.03] text-zinc-300 hover:border-white/25 hover:bg-white/[0.07]')
+                        }
+                    >
+                        <span
+                            className={
+                                'h-2 w-2 rounded-full ' +
+                                style.dot +
+                                (isActive ? '' : ' opacity-75')
+                            }
+                        />
+                        <span>{cat}</span>
+                    </button>
+                );
+            })}
+        </div>
     );
 }
 
 export default function CalendarForm({ initial, onSave }) {
     const [title, setTitle] = React.useState(initial?.title || '');
     const [date, setDate] = React.useState(
-        initial?.event_date || new Date().toISOString().slice(0,10)
+        initial?.event_date || new Date().toISOString().slice(0, 10)
     );
     const [time, setTime] = React.useState(initial?.event_time || '12:00');
     const [category, setCategory] = React.useState(initial?.category || 'Gallery');
@@ -78,64 +193,63 @@ export default function CalendarForm({ initial, onSave }) {
     };
 
     return (
-        <form onSubmit={submit} className="grid gap-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <FormField label="Event Title" required>
-                    <TextInput
-                        value={title}
-                        onChange={(e)=>setTitle(e.target.value)}
-                        placeholder="e.g., Opening at East Hall"
-                    />
-                </FormField>
-
-                <FormField label="Date" required>
-                    <TextInput
-                        type="date"
-                        value={date}
-                        onChange={(e)=>setDate(e.target.value)}
-                    />
-                </FormField>
-
-                <FormField label="Time" required>
-                    <TextInput
-                        type="time"
-                        value={time}
-                        onChange={(e)=>setTime(e.target.value)}
-                    />
-                </FormField>
-
-                <FormField label="Category" required>
-                    <select
-                        value={category}
-                        onChange={(e)=>setCategory(e.target.value)}
-                        className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-zinc-100 focus:outline-none focus:ring-2 focus:ring-white/10"
-                    >
-                        {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
-                </FormField>
-
-                <div className="md:col-span-3">
-                    <FormField label="Notes">
-                        <TextArea
-                            value={notes}
-                            onChange={(e)=>setNotes(e.target.value)}
-                            placeholder="Optional details…"
+        <section id="calendar-form">
+            <form onSubmit={submit} className="space-y-5">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                    <FormField label="Event Title" required>
+                        <TextInput
+                            value={title}
+                            onChange={(e) => setTitle(e.target.value)}
                         />
                     </FormField>
+
+                    <FormField label="Date" required>
+                        <DatePickerButton
+                            value={date}
+                            onChange={(e) => setDate(e.target.value)}
+                        />
+                    </FormField>
+
+                    <FormField label="Time" required>
+                        <TextInput
+                            type="time"
+                            value={time}
+                            onChange={(e) => setTime(e.target.value)}
+                        />
+                    </FormField>
+
+                    <div className="md:col-span-3">
+                        <FormField label="Category" required>
+                            <CategoryButtons value={category} onChange={setCategory} />
+                        </FormField>
+                    </div>
+
+                    <div className="md:col-span-3">
+                        <FormField label="Notes">
+                            <TextArea
+                                value={notes}
+                                onChange={(e) => setNotes(e.target.value)}
+                            />
+                        </FormField>
+                    </div>
                 </div>
-            </div>
 
-            {err && <div className="text-sm text-rose-400">{err}</div>}
+                {err && (
+                    <div className="text-sm text-rose-400 border border-rose-500/40 bg-rose-500/5 rounded-lg px-3 py-2">
+                        {err}
+                    </div>
+                )}
 
-            <div className="flex justify-end">
-                <button
-                    type="submit"
-                    className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-white/20 hover:bg-white/30 border border-white/10"
-                >
-                    <Check className="w-4 h-4" />
-                    Save
-                </button>
-            </div>
-        </form>
+                <div className="flex justify-end">
+                    <button
+                        type="submit"
+                        className="inline-flex items-center gap-2 rounded-lg border border-white/12 bg-white/15 px-4 py-2 text-sm font-medium text-zinc-50 hover:bg-white/25 hover:border-white/25 transition-colors"
+                    >
+                        <Check className="w-4 h-4" />
+                        Save Event
+                    </button>
+                </div>
+            </form>
+        </section>
     );
 }

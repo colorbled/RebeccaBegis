@@ -1,6 +1,14 @@
 // src/components/CalendarList.jsx
 import React from 'react';
-import { Calendar as CalIcon, Clock, Tag, Pencil, Trash2 } from 'lucide-react';
+import { createPortal } from 'react-dom';
+import {
+    Calendar as CalIcon,
+    Clock,
+    Tag,
+    Pencil,
+    Trash2,
+    Smartphone,
+} from 'lucide-react';
 
 /* Category colors for pills / accents */
 const CATEGORY_STYLES = {
@@ -86,7 +94,7 @@ function groupByMonth(items) {
         });
 }
 
-export default function CalendarList({ items = [], onEdit, onDelete }) {
+export default function CalendarList({ items = [], onEdit, onDelete, onSync }) {
     /* Live "Today" clock */
     const [now, setNow] = React.useState(new Date());
     React.useEffect(() => {
@@ -119,16 +127,33 @@ export default function CalendarList({ items = [], onEdit, onDelete }) {
         setPendingDelete(null);
     }
 
+    /* When editing, trigger parent logic then scroll to the form section */
+    function handleEdit(ev) {
+        onEdit?.(ev);
+
+        if (typeof window === 'undefined') return;
+
+        // Give React a moment to reveal the form before scrolling
+        setTimeout(() => {
+            const target =
+                document.getElementById('calendar-form') ||
+                document.getElementById('event-form');
+
+            if (target && typeof target.scrollIntoView === 'function') {
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            } else {
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        }, 50);
+    }
+
     const hasItems = items && items.length > 0;
     const months = hasItems ? groupByMonth(items) : [];
 
     return (
         <div className="space-y-4">
-            {/* Today indicator */}
-            <div className="flex justify-between items-center gap-3">
-                <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
-                    Calendar
-                </div>
+            {/* Today indicator (no "Calendar" subheading) */}
+            <div className="flex justify-end items-center">
                 <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 shadow-sm shadow-black/40 backdrop-blur">
                     <CalIcon className="h-3.5 w-3.5 text-zinc-300" />
                     <span className="text-xs font-medium text-zinc-200">
@@ -272,40 +297,70 @@ export default function CalendarList({ items = [], onEdit, onDelete }) {
                                                             )}
                                                         </div>
 
-                                                        {/* Desktop actions */}
+                                                        {/* Desktop actions: icon-only circular buttons */}
                                                         <div className="hidden sm:flex items-center gap-2 shrink-0">
                                                             <button
-                                                                onClick={() => onEdit?.(ev)}
-                                                                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[0.7rem] text-zinc-100 hover:bg-white/[0.08] hover:border-white/20 transition"
+                                                                onClick={() => handleEdit(ev)}
+                                                                type="button"
+                                                                title="Edit event"
+                                                                aria-label="Edit event"
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-white/15 bg-white/[0.04] text-zinc-100 hover:bg-white/[0.12] hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/10"
                                                             >
-                                                                <Pencil className="h-3.5 w-3.5" />
-                                                                Edit
+                                                                <Pencil className="h-4 w-4" />
                                                             </button>
+
                                                             <button
                                                                 onClick={() => setPendingDelete(ev)}
-                                                                className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-600/15 px-3 py-1.5 text-[0.7rem] text-rose-200 hover:bg-rose-600/25 hover:border-rose-400 transition"
+                                                                type="button"
+                                                                title="Delete event"
+                                                                aria-label="Delete event"
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-rose-500/50 bg-rose-600/20 text-rose-100 hover:bg-rose-600/35 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-400/60"
                                                             >
-                                                                <Trash2 className="h-3.5 w-3.5" />
-                                                                Delete
+                                                                <Trash2 className="h-4 w-4" />
+                                                            </button>
+
+                                                            <button
+                                                                onClick={() => onSync?.(ev)}
+                                                                type="button"
+                                                                title="Sync to iOS calendar"
+                                                                aria-label="Sync to iOS calendar"
+                                                                className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-emerald-500/50 bg-emerald-600/20 text-emerald-100 hover:bg-emerald-600/35 hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                                                            >
+                                                                <Smartphone className="h-4 w-4" />
                                                             </button>
                                                         </div>
                                                     </div>
 
-                                                    {/* Mobile actions */}
-                                                    <div className="mt-3 flex sm:hidden gap-2">
+                                                    {/* Mobile actions: icon-only circular buttons */}
+                                                    <div className="mt-3 flex sm:hidden justify-end gap-2">
                                                         <button
-                                                            onClick={() => onEdit?.(ev)}
-                                                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 text-[0.75rem] text-zinc-100 w-full transition"
+                                                            onClick={() => handleEdit(ev)}
+                                                            type="button"
+                                                            title="Edit event"
+                                                            aria-label="Edit event"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-white/15 bg-white/[0.04] text-zinc-100 hover:bg-white/[0.12] hover:border-white/30 focus:outline-none focus:ring-2 focus:ring-white/10"
                                                         >
-                                                            <Pencil className="h-3.5 w-3.5" />
-                                                            Edit
+                                                            <Pencil className="h-4 w-4" />
                                                         </button>
+
                                                         <button
                                                             onClick={() => setPendingDelete(ev)}
-                                                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-rose-500/40 bg-rose-600/15 hover:bg-rose-600/25 px-3 py-1.5 text-[0.75rem] text-rose-200 w-full transition"
+                                                            type="button"
+                                                            title="Delete event"
+                                                            aria-label="Delete event"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-rose-500/50 bg-rose-600/20 text-rose-100 hover:bg-rose-600/35 hover:border-rose-400 focus:outline-none focus:ring-2 focus:ring-rose-400/60"
                                                         >
-                                                            <Trash2 className="h-3.5 w-3.5" />
-                                                            Delete
+                                                            <Trash2 className="h-4 w-4" />
+                                                        </button>
+
+                                                        <button
+                                                            onClick={() => onSync?.(ev)}
+                                                            type="button"
+                                                            title="Sync to iOS calendar"
+                                                            aria-label="Sync to iOS calendar"
+                                                            className="inline-flex h-9 w-9 items-center justify-center rounded-full !p-0 border border-emerald-500/50 bg-emerald-600/20 text-emerald-100 hover:bg-emerald-600/35 hover:border-emerald-400 focus:outline-none focus:ring-2 focus:ring-emerald-400/60"
+                                                        >
+                                                            <Smartphone className="h-4 w-4" />
                                                         </button>
                                                     </div>
                                                 </div>
@@ -331,22 +386,24 @@ export default function CalendarList({ items = [], onEdit, onDelete }) {
     );
 }
 
-/* Sleek confirm modal */
+/* Sleek confirm modal, rendered via portal and centered in viewport */
 function DeleteModal({ event, onCancel, onConfirm }) {
     const dateLabel = event?.event_date
         ? formatDateFriendly(event.event_date)
         : null;
 
-    return (
+    if (typeof document === 'undefined') return null;
+
+    return createPortal(
         <div
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm"
+            className="fixed inset-0 z-[9999] flex items-center justify-center bg-black/70 backdrop-blur-sm"
             role="dialog"
             aria-modal="true"
         >
-            <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/95 to-zinc-950/95 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)]">
+            <div className="w-full max-w-sm max-h-[90vh] overflow-y-auto rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/95 to-zinc-950/95 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)]">
                 <div className="flex items-start gap-3">
                     <div className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/40">
-                        <Trash2 className="h-4.5 w-4.5 text-rose-300" />
+                        <Trash2 className="h-4 w-4 text-rose-300" />
                     </div>
                     <div className="flex-1">
                         <h2 className="text-sm font-semibold text-zinc-50">
@@ -388,6 +445,7 @@ function DeleteModal({ event, onCancel, onConfirm }) {
                     </button>
                 </div>
             </div>
-        </div>
+        </div>,
+        document.body
     );
 }
