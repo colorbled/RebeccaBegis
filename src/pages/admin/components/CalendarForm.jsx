@@ -193,7 +193,7 @@ export default function CalendarForm({ initial, onSave }) {
     };
 
     return (
-        <section id="calendar-form">
+        <section id="calendar-form" className="scroll-mt-32">
             <form onSubmit={submit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField label="Event Title" required>
