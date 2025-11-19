@@ -1,6 +1,6 @@
 // src/components/CalendarList.jsx
 import React from 'react';
-import { groupByMonth } from './calendarUtils';
+import { groupByMonth, buildICSForEvent } from './calendarUtils';
 import CalendarTodayIndicator from './CalendarTodayIndicator';
 import CalendarEmptyState from './CalendarEmptyState';
 import CalendarMonthSection from './CalendarMonthSection';
@@ -44,6 +44,39 @@ export default function CalendarList({ items = [], onEdit, onDelete, onSync }) {
         }, 50);
     }
 
+    /* iOS / browser calendar sync via ICS download */
+    function handleSync(ev) {
+        // Let parent react if it wants (analytics, toast, etc.)
+        onSync?.(ev);
+
+        if (typeof window === 'undefined' || typeof document === 'undefined') {
+            return;
+        }
+
+        const ics = buildICSForEvent(ev);
+        if (!ics) return;
+
+        const blob = new Blob([ics], {
+            type: 'text/calendar;charset=utf-8;',
+        });
+        const url = URL.createObjectURL(blob);
+
+        const link = document.createElement('a');
+        const safeTitle = (ev.title || 'event')
+            .toLowerCase()
+            .replace(/[^a-z0-9]+/g, '-')
+            .replace(/^-+|-+$/g, '') || 'event';
+
+        link.href = url;
+        link.download = `${safeTitle}.ics`;
+
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+
+        URL.revokeObjectURL(url);
+    }
+
     const hasItems = items && items.length > 0;
     const months = React.useMemo(
         () => (hasItems ? groupByMonth(items) : []),
@@ -65,7 +98,7 @@ export default function CalendarList({ items = [], onEdit, onDelete, onSync }) {
                             events={events}
                             onEdit={handleEdit}
                             onDelete={(ev) => setPendingDelete(ev)}
-                            onSync={onSync}
+                            onSync={handleSync}
                         />
                     ))}
                 </div>

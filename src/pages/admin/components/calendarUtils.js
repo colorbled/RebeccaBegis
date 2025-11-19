@@ -86,3 +86,101 @@ export function groupByMonth(items) {
             return { key, label, events: sorted };
         });
 }
+
+/* ---------------- ICS helpers for iOS / calendar sync ---------------- */
+
+function pad(n) {
+    return String(n).padStart(2, '0');
+}
+
+/** Convert date+time to local ICS datetime like 20251122T203000 */
+function toICSDateTime(dateStr, timeStr = '00:00') {
+    if (!dateStr) return null;
+    const [y, m, d] = dateStr.split('-').map(Number);
+    const [hh, mm] = (timeStr || '00:00').split(':').map(Number);
+
+    const dt = new Date(y, (m || 1) - 1, d || 1, hh || 0, mm || 0, 0);
+
+    return (
+        dt.getFullYear().toString() +
+        pad(dt.getMonth() + 1) +
+        pad(dt.getDate()) +
+        'T' +
+        pad(dt.getHours()) +
+        pad(dt.getMinutes()) +
+        '00'
+    );
+}
+
+/** Simple text escaper for ICS (commas, semicolons, newlines) */
+function escapeICS(text = '') {
+    return String(text)
+        .replace(/\\/g, '\\\\')
+        .replace(/;/g, '\\;')
+        .replace(/,/g, '\\,')
+        .replace(/\r?\n/g, '\\n');
+}
+
+/** Build ICS content string for a single event */
+export function buildICSForEvent(ev) {
+    if (!ev?.event_date) {
+        return '';
+    }
+
+    const start = toICSDateTime(ev.event_date, ev.event_time || '00:00');
+
+    // Default: 1 hour duration
+    let end = start;
+    if (start) {
+        const [y, m, d, h, min] = [
+            Number(start.slice(0, 4)),
+            Number(start.slice(4, 6)),
+            Number(start.slice(6, 8)),
+            Number(start.slice(9, 11)),
+            Number(start.slice(11, 13)),
+        ];
+        const dt = new Date(y, m - 1, d, h, min, 0);
+        const dtEnd = new Date(dt.getTime() + 60 * 60 * 1000); // +1 hour
+        end =
+            dtEnd.getFullYear().toString() +
+            pad(dtEnd.getMonth() + 1) +
+            pad(dtEnd.getDate()) +
+            'T' +
+            pad(dtEnd.getHours()) +
+            pad(dtEnd.getMinutes()) +
+            '00';
+    }
+
+    const now = new Date();
+    const dtStamp =
+        now.getFullYear().toString() +
+        pad(now.getMonth() + 1) +
+        pad(now.getDate()) +
+        'T' +
+        pad(now.getHours()) +
+        pad(now.getMinutes()) +
+        pad(now.getSeconds());
+
+    const uidBase = ev.id || `${ev.event_date}-${ev.event_time || '0000'}`;
+    const uid = `${uidBase}@art-portfolio-calendar`;
+
+    const lines = [
+        'BEGIN:VCALENDAR',
+        'VERSION:2.0',
+        'PRODID:-//Art Portfolio Calendar//EN',
+        'CALSCALE:GREGORIAN',
+        'METHOD:PUBLISH',
+        'BEGIN:VEVENT',
+        `UID:${uid}`,
+        `DTSTAMP:${dtStamp}`,
+        start ? `DTSTART:${start}` : null,
+        end ? `DTEND:${end}` : null,
+        `SUMMARY:${escapeICS(ev.title || 'Untitled Event')}`,
+        ev.notes ? `DESCRIPTION:${escapeICS(ev.notes)}` : null,
+        'END:VEVENT',
+        'END:VCALENDAR',
+    ].filter(Boolean);
+
+    // ICS prefers CRLF
+    return lines.join('\r\n');
+}
