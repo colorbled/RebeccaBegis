@@ -5,6 +5,15 @@ import { Ruler, MoveHorizontal, MoveVertical } from 'lucide-react';
 export default function DimensionsCard({
                                            w, h, onChangeW, onChangeH, presets = [], onApplyPreset
                                        }) {
+    const widthNum  = Number(w);
+    const heightNum = Number(h);
+
+    const isActivePreset = (pw, ph) =>
+        Number.isFinite(widthNum) &&
+        Number.isFinite(heightNum) &&
+        widthNum === Number(pw) &&
+        heightNum === Number(ph);
+
     return (
         <section className="rounded-2xl border border-zinc-200 bg-white text-zinc-900 shadow-sm">
             <div className="p-4 md:p-5">
@@ -15,6 +24,7 @@ export default function DimensionsCard({
                     <div className="text-sm font-medium text-zinc-800">Dimensions</div>
                 </div>
 
+                {/* Inputs */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     <label className="block">
                         <span className="block text-xs font-medium text-zinc-600 mb-1">Width</span>
@@ -53,19 +63,34 @@ export default function DimensionsCard({
 
                 <div className="my-4 h-px bg-zinc-200/70" />
 
+                {/* Quick sizes with active state */}
                 <div>
                     <div className="text-xs font-medium text-zinc-600 mb-2">Quick sizes</div>
                     <div className="flex flex-wrap gap-2">
-                        {presets.map(([pw, ph]) => (
-                            <button
-                                key={`${pw}x${ph}`}
-                                onClick={() => onApplyPreset?.(pw, ph)}
-                                className="rounded-lg border border-zinc-300 bg-zinc-100/90 ring-1 ring-inset ring-white/10 hover:bg-zinc-200 active:bg-zinc-300 px-2.5 py-1.5 text-xs text-zinc-900 shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-800/10"
-                                title={`${pw}×${ph} in`}
-                            >
-                                {pw}×{ph}
-                            </button>
-                        ))}
+                        {presets.map(([pw, ph]) => {
+                            const active = isActivePreset(pw, ph);
+                            return (
+                                <button
+                                    key={`${pw}x${ph}`}
+                                    onClick={() => onApplyPreset?.(pw, ph)}
+                                    aria-pressed={active}
+                                    className={
+                                        active
+                                            ? // active: white text on #333 background
+                                            "rounded-lg border px-2.5 py-1.5 text-xs shadow-sm focus:outline-none focus:ring-2 " +
+                                            "text-white border-[#333] bg-[#333] hover:bg-[#2b2b2b] active:bg-[#262626] " +
+                                            "focus:ring-zinc-800/20"
+                                            : // default (subtle but visible on white)
+                                            "rounded-lg border border-zinc-300 bg-zinc-100/90 ring-1 ring-inset ring-white/10 " +
+                                            "hover:bg-zinc-200 active:bg-zinc-300 px-2.5 py-1.5 text-xs text-zinc-900 " +
+                                            "shadow-sm focus:outline-none focus:ring-2 focus:ring-zinc-800/10"
+                                    }
+                                    title={`${pw}×${ph} in`}
+                                >
+                                    {pw}×{ph}
+                                </button>
+                            );
+                        })}
                     </div>
                 </div>
             </div>
