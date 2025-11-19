@@ -13,6 +13,17 @@ const TABLE_COLUMNS = {
         'id','user_id','vendor','category','date','amount','description','paymentMethod','receiptId',
         'image_url','notes','created_at'
     ],
+    // ✅ pricing prefs for price tiers (per user)
+    pricing_prefs: [
+        'id','user_id',
+        'cheap_ppi','medium_ppi','expensive_ppi',
+        'cheap_color','medium_color','expensive_color',
+        'created_at','updated_at'
+    ],
+    // ✅ calendar events
+    events: [
+        'id','user_id','title','event_date','event_time','category','notes','created_at'
+    ],
 };
 
 // Convert a record coming from the UI into DB-safe snake_case keys
@@ -35,6 +46,19 @@ function toDbShape(table, rec) {
     if ('height_ft' in out && out.height_ft != null && out.height_in == null) out.height_in = Math.round(Number(out.height_ft) * 12);
     delete out.width_ft;
     delete out.height_ft;
+
+    // ✅ events (camelCase -> snake_case)
+    if ('eventDate' in out) { out.event_date = out.eventDate; delete out.eventDate; }
+    if ('eventTime' in out) { out.event_time = out.eventTime; delete out.eventTime; }
+
+    // ✅ pricing_prefs (camelCase -> snake_case)
+    if ('cheapPpi'     in out) { out.cheap_ppi     = out.cheapPpi;     delete out.cheapPpi; }
+    if ('mediumPpi'    in out) { out.medium_ppi    = out.mediumPpi;    delete out.mediumPpi; }
+    if ('expensivePpi' in out) { out.expensive_ppi = out.expensivePpi; delete out.expensivePpi; }
+
+    if ('cheapColor'     in out) { out.cheap_color     = out.cheapColor;     delete out.cheapColor; }
+    if ('mediumColor'    in out) { out.medium_color    = out.mediumColor;    delete out.mediumColor; }
+    if ('expensiveColor' in out) { out.expensive_color = out.expensiveColor; delete out.expensiveColor; }
 
     // add user_id if missing (caller ensures user is available)
     return out;
@@ -62,11 +86,26 @@ export function useRemoteTable(table) {
 
     const fetchRows = useCallback(async () => {
         setLoading(true);
-        const q = supabase.from(table).select('*');
-        // Order by created_at if you have it; fall back to date
-        const { data, error } = await q
-            .order('created_at', { ascending: false })
-            .order('date', { ascending: false, nullsFirst: true });
+
+        let q = supabase.from(table).select('*');
+
+        // Table-specific default ordering
+        if (table === 'events') {
+            q = q
+                .order('event_date', { ascending: true, nullsFirst: true })
+                .order('event_time', { ascending: true, nullsFirst: true })
+                .order('created_at', { ascending: true, nullsFirst: true });
+        } else if (table === 'pricing_prefs') {
+            // Only one row per user is typical; sort newest first just in case
+            q = q.order('updated_at', { ascending: false, nullsFirst: true })
+                .order('created_at', { ascending: false, nullsFirst: true });
+        } else {
+            // Default: newest first, then date if present
+            q = q.order('created_at', { ascending: false, nullsFirst: true })
+                .order('date', { ascending: false, nullsFirst: true });
+        }
+
+        const { data, error } = await q;
         if (error) {
             console.error(`[${table}] select error:`, error);
         } else {
@@ -86,7 +125,10 @@ export function useRemoteTable(table) {
 
         const { data, error } = await supabase.from(table).upsert(payload).select();
         if (error) {
-            console.error(`[${table}] upsert error payload=`, payload, 'error=', error);
+            console.error(
+                `[${table}] upsert error`,
+                { payload, error }
+            );
             throw error;
         }
         await fetchRows();

@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Plus, X, DollarSign, Wallet, TrendingUp, Download, LogOut } from 'lucide-react';
+import { Plus, X, DollarSign, Wallet, TrendingUp, Download, LogOut, History } from 'lucide-react';
 import TabNav from './components/TabNav';
 import SoldForm from './components/SoldForm';
 import SoldList from './components/SoldList';
@@ -11,6 +11,8 @@ import AuthGate from './components/AuthGate';
 import { supabase } from './lib/supabaseClient'; // ⬅️ adjust the path if your client lives elsewhere
 import CalculatorPanel from './components/CalculatorPanel';
 import PricesPanel from './components/PricesPanel';
+import CalendarForm from './components/CalendarForm';
+import CalendarList from './components/CalendarList';
 
 // --- tiny helper for optional CSV export (kept local to the page) ---
 function exportCsv(filename, rows) {
@@ -62,6 +64,12 @@ export default function Admin() {
     const { rows: expenses, upsert: upsertExpense, remove: removeExpense } = useRemoteTable('expenses');
     const [editingExpense, setEditingExpense] = useState(null);
 
+    // Calendar/events
+    const { rows: events, upsert: upsertEvent, remove: removeEvent, refetch: refetchEvents } = useRemoteTable('events');
+    const [editingEvent, setEditingEvent] = useState(null);
+    const [showPast, setShowPast] = useState(false);
+
+    // KPI totals
     const soldTotal = useMemo(() => sold.reduce((s, i) => s + Number(i.price || 0), 0), [sold]);
     const expensesTotal = useMemo(() => expenses.reduce((s, i) => s + Number(i.amount || 0), 0), [expenses]);
     const net = soldTotal - expensesTotal;
@@ -115,7 +123,7 @@ export default function Admin() {
     const PrimaryBtn = ({ children, className = '', ...props }) => (
         <button
             {...props}
-            className={`inline-flex items-center justify-center gap-2 rounded-lg bg-white/90 text-black hover:bg-white px-3 py-2 text-sm font-medium shadow-sm w-full md:w-auto ${className}`}
+            className={`inline-flex items-center justify-center gap-2 rounded-lg bg-white/90 text-black hover:bg:white px-3 py-2 text-sm font-medium shadow-sm w-full md:w-auto ${className}`}
         >
             {children}
         </button>
@@ -141,6 +149,24 @@ export default function Admin() {
             <span className="hidden sm:inline">Sign out</span>
         </button>
     );
+
+    // --- Calendar helpers ---
+    // Cutoff: first day of current month (local)
+    const firstOfThisMonth = (() => {
+        const d = new Date();
+        return new Date(d.getFullYear(), d.getMonth(), 1);
+    })();
+    const fmtISO = (d) => d.toISOString().slice(0, 10);
+
+    const filteredEvents = useMemo(() => {
+        if (showPast) return events;
+        // Only events with event_date >= first day of current month
+        return events.filter(e => {
+            const iso = (e.event_date || '').slice(0, 10);
+            if (!iso) return false;
+            return iso >= fmtISO(firstOfThisMonth);
+        });
+    }, [events, showPast]);
 
     return (
         <AuthGate>
@@ -192,6 +218,7 @@ export default function Admin() {
                                 { value: 'expenses', label: 'Expenditures' },
                                 { value: 'calc', label: 'Calculator' },
                                 { value: 'prices', label: 'Prices' },
+                                { value: 'calendar', label: 'Calendar' },
                             ]}
                         />
                     </div>
@@ -296,6 +323,56 @@ export default function Admin() {
                         <div className="grid gap-6">
                             <Toolbar left={<h2 className="text-base md:text-lg font-semibold">Prices</h2>} right={null} />
                             <PricesPanel />
+                        </div>
+                    ) : tab === 'calendar' ? (
+                        <div className="grid gap-6">
+                            <Toolbar
+                                left={<h2 className="text-base md:text-lg font-semibold">Calendar</h2>}
+                                right={
+                                    <>
+                                        <GhostBtn onClick={() => exportCsv('events.csv', events)}>
+                                            <Download className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Export CSV</span>
+                                        </GhostBtn>
+                                        <GhostBtn onClick={() => setShowPast(v => !v)}>
+                                            <History className="h-4 w-4" />
+                                            <span className="hidden sm:inline">{showPast ? 'Hide past' : 'Show past'}</span>
+                                            <span className="sm:hidden">{showPast ? 'Hide' : 'Past'}</span>
+                                        </GhostBtn>
+                                        <PrimaryBtn onClick={() => setEditingEvent({})}>
+                                            <Plus className="h-4 w-4" />
+                                            <span className="hidden sm:inline">Add Event</span>
+                                            <span className="sm:hidden">Add</span>
+                                        </PrimaryBtn>
+                                    </>
+                                }
+                            />
+
+                            {editingEvent && (
+                                <div className="rounded-xl border border-white/10 bg-white/5 p-4">
+                                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                                        <div className="font-medium">{editingEvent?.id ? 'Edit Event' : 'New Event'}</div>
+                                        <GhostBtn onClick={() => setEditingEvent(null)} title="Close">
+                                            <X className="w-4 h-4" />
+                                            Close
+                                        </GhostBtn>
+                                    </div>
+                                    <CalendarForm
+                                        initial={editingEvent?.id ? editingEvent : undefined}
+                                        onSave={async (rec) => {
+                                            await upsertEvent(rec);
+                                            setEditingEvent(null);
+                                            await refetchEvents();
+                                        }}
+                                    />
+                                </div>
+                            )}
+
+                            <CalendarList
+                                items={filteredEvents}
+                                onEdit={setEditingEvent}
+                                onDelete={removeEvent}
+                            />
                         </div>
                     ) : null}
                 </main>
