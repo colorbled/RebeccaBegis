@@ -32,10 +32,12 @@ function TextInput(props) {
     );
 }
 
-/** Date picker "button" that programmatically opens the native date picker */
+/**
+ * Fully native, mobile-friendly date picker:
+ * - Real <input type="date"> covers the whole area (transparent)
+ * - Custom "button" underneath for visual styling
+ */
 function DatePickerButton({ value, onChange }) {
-    const inputRef = React.useRef(null);
-
     let display = 'Select date';
     if (value) {
         const d = new Date(value + 'T00:00:00');
@@ -47,43 +49,26 @@ function DatePickerButton({ value, onChange }) {
         }
     }
 
-    const openPicker = () => {
-        const input = inputRef.current;
-        if (!input) return;
-
-        // Modern browsers
-        if (typeof input.showPicker === 'function') {
-            input.showPicker();
-        } else {
-            // Fallback for older / mobile browsers
-            input.focus();
-            input.click();
-        }
-    };
-
     return (
         <div className="relative">
-            {/* Visible button-like surface */}
-            <button
-                type="button"
-                onClick={openPicker}
-                className="flex w-full items-center justify-between rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm transition-colors hover:border-white/25 hover:bg-black/50 focus:outline-none focus:ring-2 focus:ring-white/10 focus:border-white/25"
-            >
+            {/* Visual layer */}
+            <div className="flex w-full items-center justify-between rounded-lg border border-white/12 bg-black/40 px-3 py-2 text-sm transition-colors hover:border-white/25 hover:bg-black/50">
                 <span className={value ? 'text-zinc-100' : 'text-zinc-500'}>
                     {display}
                 </span>
                 <CalIcon className="h-4 w-4 text-zinc-400 shrink-0" />
-            </button>
+            </div>
 
-            {/* Actual date input, visually hidden but used for native picker */}
+            {/* Actual interactive input */}
             <input
-                ref={inputRef}
                 type="date"
                 value={value}
                 onChange={onChange}
-                className="sr-only"
-                // prevent keyboard editing even if it gets focus
-                onKeyDown={(e) => e.preventDefault()}
+                className="
+                    absolute inset-0
+                    opacity-0
+                    cursor-pointer
+                "
             />
         </div>
     );
@@ -193,7 +178,7 @@ export default function CalendarForm({ initial, onSave }) {
     };
 
     return (
-        <section id="calendar-form" className="scroll-mt-32">
+        <section id="calendar-form" className="scroll-mt-24">
             <form onSubmit={submit} className="space-y-5">
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <FormField label="Event Title" required>
