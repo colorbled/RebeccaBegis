@@ -2,11 +2,17 @@
 import React from 'react';
 import { Calendar as CalIcon, Clock, Tag, Pencil, Trash2 } from 'lucide-react';
 
-/* Category colors */
+/* Category colors for pills / accents */
 const CATEGORY_STYLES = {
     Gallery: 'text-sky-300 border-sky-500/30 bg-sky-500/10',
     Meetup:  'text-amber-300 border-amber-500/30 bg-amber-500/10',
     'Misc.': 'text-zinc-300 border-zinc-500/30 bg-zinc-500/10',
+};
+
+const CATEGORY_ACCENT = {
+    Gallery: 'border-l-sky-400/70',
+    Meetup:  'border-l-amber-400/70',
+    'Misc.': 'border-l-zinc-500/70',
 };
 
 /* Ordinal suffix for day numbers */
@@ -113,155 +119,205 @@ export default function CalendarList({ items = [], onEdit, onDelete }) {
         setPendingDelete(null);
     }
 
-    if (!items.length) {
-        return (
-            <div>
-                <div className="flex justify-end text-sm text-zinc-400 mb-2 pr-1">
-                    <span className="px-3 py-1 rounded-md border border-white/10 bg-white/5">
-                        Today: {formatNow(now)}
-                    </span>
-                </div>
-                <div className="text-center text-sm text-zinc-400 py-8 border border-dashed border-white/10 rounded-xl">
-                    No upcoming events
-                </div>
-
-                {/* Delete confirm modal (will never show here, but keep structure consistent) */}
-                {pendingDelete && (
-                    <DeleteModal
-                        event={pendingDelete}
-                        onCancel={() => setPendingDelete(null)}
-                        onConfirm={handleConfirmDelete}
-                    />
-                )}
-            </div>
-        );
-    }
-
-    const months = groupByMonth(items);
+    const hasItems = items && items.length > 0;
+    const months = hasItems ? groupByMonth(items) : [];
 
     return (
-        <div>
+        <div className="space-y-4">
             {/* Today indicator */}
-            <div className="flex justify-end text-sm text-zinc-400 mb-2 pr-1">
-                <span className="px-3 py-1 rounded-md border border-white/10 bg-white/5">
-                    Today: {formatNow(now)}
-                </span>
+            <div className="flex justify-between items-center gap-3">
+                <div className="text-xs uppercase tracking-[0.18em] text-zinc-500">
+                    Calendar
+                </div>
+                <div className="inline-flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1 shadow-sm shadow-black/40 backdrop-blur">
+                    <CalIcon className="h-3.5 w-3.5 text-zinc-300" />
+                    <span className="text-xs font-medium text-zinc-200">
+                        Today
+                    </span>
+                    <span className="text-[0.7rem] text-zinc-400">
+                        {formatNow(now)}
+                    </span>
+                </div>
             </div>
 
-            <div className="grid gap-6">
-                {months.map(({ key, label, events }) => (
-                    <section
-                        key={key}
-                        className="rounded-xl border border-white/10 bg-white/[0.04] overflow-hidden"
-                    >
-                        <header className="px-4 py-2 border-b border-white/10 text-sm text-zinc-300">
-                            {label}
-                        </header>
+            {!hasItems && (
+                <div className="rounded-2xl border border-dashed border-white/10 bg-gradient-to-br from-zinc-900/70 to-zinc-950/80 px-6 py-10 text-center shadow-inner shadow-black/40">
+                    <div className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/[0.03] border border-white/10 mb-3">
+                        <CalIcon className="h-5 w-5 text-zinc-400" />
+                    </div>
+                    <div className="text-sm font-medium text-zinc-200">
+                        No upcoming events
+                    </div>
+                    <div className="mt-1 text-xs text-zinc-500">
+                        Add a new gallery show, meetup, or special date to see it
+                        appear here.
+                    </div>
+                </div>
+            )}
 
-                        <ul className="divide-y divide-white/10">
-                            {events.map((ev) => {
-                                const dateStr = formatDateFriendly(ev.event_date);
-                                const timeStr = formatTimeFriendly(ev.event_time);
-                                const catStyle =
-                                    CATEGORY_STYLES[ev.category] ||
-                                    CATEGORY_STYLES['Misc.'];
-                                const past = isEventPast(ev);
+            {hasItems && (
+                <div className="grid gap-6">
+                    {months.map(({ key, label, events }) => (
+                        <section
+                            key={key}
+                            className="rounded-2xl border border-white/[0.06] bg-gradient-to-b from-white/[0.04] to-zinc-950/60 shadow-[0_18px_40px_rgba(0,0,0,0.55)] overflow-hidden"
+                        >
+                            <header className="flex items-center justify-between px-4 py-3 border-b border-white/10 bg-white/[0.03] backdrop-blur-sm">
+                                <div className="text-sm font-medium text-zinc-100">
+                                    {label}
+                                </div>
+                                <div className="text-[0.7rem] uppercase tracking-[0.18em] text-zinc-500">
+                                    Events
+                                </div>
+                            </header>
 
-                                return (
-                                    <li
-                                        key={ev.id}
-                                        className={`p-4 transition-opacity ${
-                                            past ? 'opacity-60' : ''
-                                        }`}
-                                    >
-                                        <div className="flex items-start justify-between gap-3">
-                                            <div className="min-w-0">
-                                                <div
-                                                    className={`font-medium truncate ${
-                                                        past ? 'text-zinc-300' : 'text-white'
-                                                    }`}
-                                                >
-                                                    {ev.title || 'Untitled Event'}
+                            <ul className="divide-y divide-white/5">
+                                {events.map((ev) => {
+                                    const dateStr = formatDateFriendly(ev.event_date);
+                                    const timeStr = formatTimeFriendly(ev.event_time);
+                                    const catStyle =
+                                        CATEGORY_STYLES[ev.category] ||
+                                        CATEGORY_STYLES['Misc.'];
+                                    const accent =
+                                        CATEGORY_ACCENT[ev.category] ||
+                                        CATEGORY_ACCENT['Misc.'];
+                                    const past = isEventPast(ev);
+
+                                    // For date pill
+                                    let dayNum = null;
+                                    let dowShort = null;
+                                    if (ev.event_date) {
+                                        const d = new Date(ev.event_date + 'T00:00:00');
+                                        if (!Number.isNaN(d.getTime())) {
+                                            dayNum = d.getDate();
+                                            dowShort = d.toLocaleDateString('en-US', {
+                                                weekday: 'short',
+                                            });
+                                        }
+                                    }
+
+                                    return (
+                                        <li
+                                            key={ev.id}
+                                            className={`
+                                                group
+                                                border-l-2 ${accent}
+                                                px-4 py-3 sm:px-5 sm:py-4
+                                                transition
+                                                bg-white/[0.015]
+                                                hover:bg-white/[0.04]
+                                                ${past ? 'opacity-60' : ''}
+                                            `}
+                                        >
+                                            <div className="flex items-start gap-4">
+                                                {/* Date pill */}
+                                                <div className="mt-0.5 hidden sm:flex">
+                                                    <div className="flex flex-col items-center justify-center rounded-xl border border-white/10 bg-zinc-950/70 px-2.5 py-1.5 shadow-inner shadow-black/40 min-w-[3rem]">
+                                                        <div className="text-[0.65rem] uppercase tracking-[0.18em] text-zinc-500">
+                                                            {dowShort || '—'}
+                                                        </div>
+                                                        <div className="text-lg font-semibold text-zinc-100 leading-none mt-0.5">
+                                                            {dayNum || '–'}
+                                                        </div>
+                                                    </div>
                                                 </div>
 
-                                                <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2 text-sm text-zinc-400">
-                                                    <div className="inline-flex items-center gap-1.5">
-                                                        <CalIcon className="h-4 w-4 opacity-80" />
-                                                        <span>{dateStr}</span>
-                                                    </div>
-                                                    <div className="inline-flex items-center gap-1.5">
-                                                        <Clock className="h-4 w-4 opacity-80" />
-                                                        <span>{timeStr}</span>
+                                                {/* Main content */}
+                                                <div className="flex-1 min-w-0">
+                                                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
+                                                        {/* Title & meta */}
+                                                        <div className="min-w-0">
+                                                            <div
+                                                                className={`font-medium truncate ${
+                                                                    past
+                                                                        ? 'text-zinc-300'
+                                                                        : 'text-zinc-50'
+                                                                }`}
+                                                            >
+                                                                {ev.title || 'Untitled Event'}
+                                                            </div>
+
+                                                            {/* Meta row(s) */}
+                                                            <div className="mt-1 flex flex-wrap gap-x-4 gap-y-2 text-[0.78rem] text-zinc-400">
+                                                                <div className="inline-flex items-center gap-1.5">
+                                                                    <CalIcon className="h-3.5 w-3.5 opacity-80" />
+                                                                    <span>{dateStr}</span>
+                                                                </div>
+                                                                <div className="inline-flex items-center gap-1.5">
+                                                                    <Clock className="h-3.5 w-3.5 opacity-80" />
+                                                                    <span>{timeStr}</span>
+                                                                </div>
+                                                                {ev.category && (
+                                                                    <span
+                                                                        className={`
+                                                                            inline-flex items-center gap-1.5 rounded-full border px-2 py-0.5 text-[0.7rem]
+                                                                            ${catStyle}
+                                                                        `}
+                                                                    >
+                                                                        <Tag className="h-3 w-3" />
+                                                                        {ev.category}
+                                                                    </span>
+                                                                )}
+                                                                {past && (
+                                                                    <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-700/70 bg-zinc-900/80 px-2 py-0.5 text-[0.65rem] uppercase tracking-[0.18em] text-zinc-300">
+                                                                        Past
+                                                                    </span>
+                                                                )}
+                                                            </div>
+
+                                                            {ev.notes && (
+                                                                <div className="mt-2 text-[0.8rem] leading-relaxed text-zinc-300 whitespace-pre-wrap">
+                                                                    {ev.notes}
+                                                                </div>
+                                                            )}
+                                                        </div>
+
+                                                        {/* Desktop actions */}
+                                                        <div className="hidden sm:flex items-center gap-2 shrink-0">
+                                                            <button
+                                                                onClick={() => onEdit?.(ev)}
+                                                                className="inline-flex items-center gap-1.5 rounded-full border border-white/10 bg-white/[0.03] px-3 py-1.5 text-[0.7rem] text-zinc-100 hover:bg-white/[0.08] hover:border-white/20 transition"
+                                                            >
+                                                                <Pencil className="h-3.5 w-3.5" />
+                                                                Edit
+                                                            </button>
+                                                            <button
+                                                                onClick={() => setPendingDelete(ev)}
+                                                                className="inline-flex items-center gap-1.5 rounded-full border border-rose-500/40 bg-rose-600/15 px-3 py-1.5 text-[0.7rem] text-rose-200 hover:bg-rose-600/25 hover:border-rose-400 transition"
+                                                            >
+                                                                <Trash2 className="h-3.5 w-3.5" />
+                                                                Delete
+                                                            </button>
+                                                        </div>
                                                     </div>
 
-                                                    {ev.category && (
-                                                        <span
-                                                            className={`inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs ${catStyle}`}
+                                                    {/* Mobile actions */}
+                                                    <div className="mt-3 flex sm:hidden gap-2">
+                                                        <button
+                                                            onClick={() => onEdit?.(ev)}
+                                                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/[0.04] hover:bg-white/[0.08] px-3 py-1.5 text-[0.75rem] text-zinc-100 w-full transition"
                                                         >
-                                                            <Tag className="h-3.5 w-3.5" />
-                                                            {ev.category}
-                                                        </span>
-                                                    )}
-
-                                                    {past && (
-                                                        <span className="inline-flex items-center gap-1.5 rounded-full border border-zinc-600/60 bg-zinc-900/70 px-2 py-0.5 text-[0.65rem] uppercase tracking-wide text-zinc-300">
-                                                            Past event
-                                                        </span>
-                                                    )}
-                                                </div>
-
-                                                {ev.notes && (
-                                                    <div className="mt-2 text-sm text-zinc-300 whitespace-pre-wrap">
-                                                        {ev.notes}
+                                                            <Pencil className="h-3.5 w-3.5" />
+                                                            Edit
+                                                        </button>
+                                                        <button
+                                                            onClick={() => setPendingDelete(ev)}
+                                                            className="inline-flex items-center justify-center gap-1.5 rounded-lg border border-rose-500/40 bg-rose-600/15 hover:bg-rose-600/25 px-3 py-1.5 text-[0.75rem] text-rose-200 w-full transition"
+                                                        >
+                                                            <Trash2 className="h-3.5 w-3.5" />
+                                                            Delete
+                                                        </button>
                                                     </div>
-                                                )}
+                                                </div>
                                             </div>
-
-                                            {/* Desktop actions */}
-                                            <div className="hidden sm:flex items-center gap-2 shrink-0">
-                                                <button
-                                                    onClick={() => onEdit?.(ev)}
-                                                    className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 px-2 py-1 text-xs"
-                                                >
-                                                    <Pencil className="h-3.5 w-3.5" />
-                                                    Edit
-                                                </button>
-
-                                                <button
-                                                    onClick={() => setPendingDelete(ev)}
-                                                    className="inline-flex items-center gap-1.5 rounded-md border border-white/10 bg-white/5 hover:bg-rose-600/20 px-2 py-1 text-xs text-rose-300"
-                                                >
-                                                    <Trash2 className="h-3.5 w-3.5" />
-                                                    Delete
-                                                </button>
-                                            </div>
-                                        </div>
-
-                                        {/* Mobile actions */}
-                                        <div className="mt-3 flex sm:hidden gap-2">
-                                            <button
-                                                onClick={() => onEdit?.(ev)}
-                                                className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs w-full"
-                                            >
-                                                <Pencil className="h-3.5 w-3.5" />
-                                                Edit
-                                            </button>
-
-                                            <button
-                                                onClick={() => setPendingDelete(ev)}
-                                                className="inline-flex items-center justify-center gap-1.5 rounded-md border border-white/10 bg-white/5 hover:bg-rose-600/20 px-3 py-1.5 text-xs text-rose-300 w-full"
-                                            >
-                                                <Trash2 className="h-3.5 w-3.5" />
-                                                Delete
-                                            </button>
-                                        </div>
-                                    </li>
-                                );
-                            })}
-                        </ul>
-                    </section>
-                ))}
-            </div>
+                                        </li>
+                                    );
+                                })}
+                            </ul>
+                        </section>
+                    ))}
+                </div>
+            )}
 
             {/* Delete confirmation modal */}
             {pendingDelete && (
@@ -275,7 +331,7 @@ export default function CalendarList({ items = [], onEdit, onDelete }) {
     );
 }
 
-/* Simple inline modal component */
+/* Sleek confirm modal */
 function DeleteModal({ event, onCancel, onConfirm }) {
     const dateLabel = event?.event_date
         ? formatDateFriendly(event.event_date)
@@ -283,45 +339,50 @@ function DeleteModal({ event, onCancel, onConfirm }) {
 
     return (
         <div
-            className="fixed inset-0 z-40 flex items-center justify-center bg-black/60 backdrop-blur-sm"
+            className="fixed inset-0 z-40 flex items-center justify-center bg-black/70 backdrop-blur-sm"
             role="dialog"
             aria-modal="true"
         >
-            <div className="w-full max-w-sm rounded-xl border border-white/10 bg-zinc-900/95 p-4 shadow-xl">
-                <div className="flex items-center justify-between mb-2">
-                    <h2 className="text-sm font-semibold text-zinc-100">
-                        Delete event?
-                    </h2>
+            <div className="w-full max-w-sm rounded-2xl border border-white/10 bg-gradient-to-b from-zinc-900/95 to-zinc-950/95 p-5 shadow-[0_28px_80px_rgba(0,0,0,0.85)]">
+                <div className="flex items-start gap-3">
+                    <div className="mt-0.5 inline-flex h-9 w-9 items-center justify-center rounded-2xl bg-rose-500/10 border border-rose-500/40">
+                        <Trash2 className="h-4.5 w-4.5 text-rose-300" />
+                    </div>
+                    <div className="flex-1">
+                        <h2 className="text-sm font-semibold text-zinc-50">
+                            Delete event?
+                        </h2>
+                        <p className="mt-1 text-xs text-zinc-300 leading-relaxed">
+                            Are you sure you want to delete{' '}
+                            <span className="font-medium text-zinc-50">
+                                {event?.title || 'this event'}
+                            </span>
+                            {dateLabel ? (
+                                <>
+                                    {' '}
+                                    scheduled for{' '}
+                                    <span className="text-zinc-100">{dateLabel}</span>?
+                                </>
+                            ) : (
+                                '?'
+                            )}
+                            {' '}This action cannot be undone.
+                        </p>
+                    </div>
                 </div>
-
-                <p className="text-sm text-zinc-300">
-                    Are you sure you want to delete{' '}
-                    <span className="font-medium text-white">
-                        {event?.title || 'this event'}
-                    </span>
-                    {dateLabel ? (
-                        <>
-                            {' '}
-                            scheduled for{' '}
-                            <span className="text-zinc-200">{dateLabel}</span>?
-                        </>
-                    ) : (
-                        '?'
-                    )}
-                </p>
 
                 <div className="mt-4 flex justify-end gap-2">
                     <button
                         type="button"
                         onClick={onCancel}
-                        className="inline-flex items-center justify-center rounded-md border border-white/10 bg-white/5 hover:bg-white/10 px-3 py-1.5 text-xs text-zinc-200"
+                        className="inline-flex items-center justify-center rounded-full border border-white/10 bg-white/[0.04] px-3.5 py-1.5 text-xs text-zinc-100 hover:bg-white/[0.08] hover:border-white/20 transition"
                     >
                         Cancel
                     </button>
                     <button
                         type="button"
                         onClick={onConfirm}
-                        className="inline-flex items-center justify-center rounded-md border border-rose-500/70 bg-rose-600/80 hover:bg-rose-500 px-3 py-1.5 text-xs text-white"
+                        className="inline-flex items-center justify-center rounded-full border border-rose-500/60 bg-rose-600/90 px-3.5 py-1.5 text-xs font-medium text-white hover:bg-rose-500 hover:border-rose-400 transition"
                     >
                         Delete
                     </button>
